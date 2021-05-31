@@ -65,7 +65,7 @@ class ApiResults {
 }
 
 Future<ApiResults> fetchApiResults() async {
-  var url = "http://haveabook.php.xdomain.jp/api/sumple_api.php";
+  var url = "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php";
   var request = new SampleRequest(id: 1234, name: '大和賢一郎');
   final response = await http.post(url,
       body: json.encode(request.toJson()),
