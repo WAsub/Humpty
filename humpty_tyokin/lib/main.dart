@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 
+import 'customParameter.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -130,6 +132,9 @@ class _MyAppState extends State<MyApp> {
                               alignment: AlignmentDirectional.center,
                               children: [
                                 /** どのぐらい目標達成したか */
+                                // CustomParameter(par,
+                                //   deviceHeight,deviceWidth
+                                // ),
                                 Container(
                                   height: deviceHeight,
                                   width: deviceWidth,
