@@ -20,7 +20,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Future<ApiResults> res;
 
-  double swipH = -100;
+  double swipB = 50;
+  int total = 0;
+  int goal = 0;
   @override
   void initState() {
     super.initState();
@@ -116,8 +118,7 @@ class _MyAppState extends State<MyApp> {
                   height: deviceHeight - 50,
                   alignment: Alignment.center,
                   color: Colors.greenAccent,
-                  child: Container(
-                    child: FutureBuilder<ApiResults>(
+                  child: FutureBuilder<ApiResults>(
                       future: res,
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
@@ -126,94 +127,64 @@ class _MyAppState extends State<MyApp> {
                           for (var i = 0; i < snapshot.data.data.length; i++) {
                             total += snapshot.data.data[i]["money"];
                           }
-                          var par = total / goal;
 
                           return Stack(
                               alignment: AlignmentDirectional.center,
                               children: [
-                                /** どのぐらい目標達成したか */
-                                // CustomParameter(par,
-                                //   deviceHeight,deviceWidth
-                                // ),
-                                Container(
+                                /** 貯金額と目標達成率 */
+                                CustomParameter(
+                                  total: total,
+                                  goal: goal,
                                   height: deviceHeight,
-                                  width: deviceWidth,
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    height: 300,
-                                    width: 300,
-                                    child: CustomPaint(
-                                      size: Size(deviceWidth, deviceHeight),
-                                      painter: CirclePainter(par: par),
-                                    ),
-                                  ),
-                                ),
-                                /** 数字類 */
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    /** 貯金額 */
-                                    Text(
-                                      total.toString(),
-                                      style: TextStyle(
-                                          fontSize: 60,
-                                          fontWeight: FontWeight.w200),
-                                    ),
-                                    /** アイコンと目標額 */
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.flag),
-                                        Text(goal.toString())
-                                      ],
-                                    ),
-                                  ],
+                                  width: deviceWidth
                                 ),
                                 /** 履歴画面(下スワイプ) */
                                 AnimatedPositioned(
                                   duration: Duration(milliseconds: 200),
-                                  top: deviceHeight + swipH,
+                                  bottom: -(deviceHeight / 5 * 4 -swipB ),
                                   child: GestureDetector(
-                                    onVerticalDragUpdate:
-                                        (DragUpdateDetails details) {
+                                    onVerticalDragUpdate: (DragUpdateDetails details) {
                                       setState(() {
-                                        if (details.delta.dy < -10) {
-                                          var dy = deviceHeight / 5 * 4.5;
-                                          swipH = dy - dy - dy;
+                                        if (details.delta.dy < -10) { //上スワイプ
+                                          swipB = deviceHeight / 5 * 4;
                                         }
-                                        if (details.delta.dy > 10) {
-                                          swipH = -100;
+                                        if (details.delta.dy > 10) { //下スワイプ
+                                          swipB = 50;
                                         }
                                       });
                                     },
                                     /** 履歴画面 */
                                     child: Container(
-                                        color: Colors.brown[500],
                                         width: deviceWidth,
-                                        height: deviceHeight / 5 * 4.5,
-                                        child: Center(
-                                          child: Container(
+                                        height: deviceHeight / 5 * 4,
+                                        decoration: BoxDecoration(
+                                          color: Colors.brown[500],
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: 50,
+                                              alignment: Alignment.topCenter,
+                                              padding: EdgeInsets.only(top: 5),
+                                              child: Container(height: 4,width: 80,
+                                                decoration: BoxDecoration(color: Colors.orangeAccent,borderRadius: BorderRadius.circular(2),),
+                                              ),
+                                            ),
+                                            /** 履歴リスト */
+                                            Container(
                                             color: Colors.amberAccent,
                                             width: deviceWidth * 0.9,
-                                            height:
-                                                deviceHeight / 5 * 4.5 * 0.7,
+                                            height: deviceHeight / 5 * 4 * 0.7,
                                             child: ListView.separated(
-                                              itemCount:
-                                                  snapshot.data.data.length,
+                                              itemCount: snapshot.data.data.length,
                                               itemBuilder: (context, index) {
-                                                debugPrint(
-                                                    deviceHeight.toString());
                                                 return Row(
                                                   children: [
                                                     Text(
-                                                      snapshot.data
-                                                          .data[index]["userid"]
-                                                          .toString(),
+                                                      snapshot.data.data[index]["userid"].toString(),
                                                       style: TextStyle(
-                                                        backgroundColor:
-                                                            Colors.redAccent,
+                                                        backgroundColor:Colors.redAccent,
                                                       ),
                                                     ),
                                                     Text(
@@ -239,18 +210,19 @@ class _MyAppState extends State<MyApp> {
                                                   ],
                                                 );
                                               },
-                                              separatorBuilder:
-                                                  (context, index) {
-                                                return Divider(
-                                                  height: 5,
-                                                );
+                                              separatorBuilder:(context, index) {
+                                                return Divider(height: 5,);
                                               },
                                             ),
                                           ),
-                                        )),
+                                          ]
+                                        ),
+                                        
+                                    )
                                   ),
                                 ),
-                              ]);
+                              ]
+                          );
                         } else if (snapshot.hasError) {
                           /** サーバーから結果が得られなかったときの処理 */ //TODO ローカル保存もするべきか？
                           return Text("${snapshot.error}");
@@ -259,43 +231,12 @@ class _MyAppState extends State<MyApp> {
                       },
                     ),
                   ),
-                ),
+                
               ],
             );
           }),
         ));
   }
-}
-
-class CirclePainter extends CustomPainter {
-  final double par;
-  CirclePainter({
-    this.par,
-  });
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Rect.fromLTRB(20, 20, 280, 280);
-    final startAngle = -60 * math.pi / 180;
-    final sweepAngle = 300 * math.pi / 180;
-    final useCenter = false;
-    final paint = Paint()
-      ..color = Colors.pinkAccent
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 28
-      ..strokeCap = StrokeCap.round;
-    canvas.drawArc(rect, startAngle, sweepAngle, useCenter, paint);
-
-    final paint2 = Paint()
-      ..color = Colors.purpleAccent
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 28
-      ..strokeCap = StrokeCap.round;
-    final sweepAngle2 = 300 * math.pi / 180 * par;
-    canvas.drawArc(rect, startAngle, sweepAngle2, useCenter, paint2);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
 
 class ApiResults {
