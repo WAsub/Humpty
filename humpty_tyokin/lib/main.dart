@@ -114,122 +114,129 @@ class _MyAppState extends State<MyApp> {
                         ]),
                   ),
                 ),
+
                 Container(
                   height: deviceHeight - 50,
                   alignment: Alignment.center,
                   color: Colors.greenAccent,
-                  child: FutureBuilder<ApiResults>(
-                      future: res,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          var total = 0;
-                          var goal = 1000;
-                          for (var i = 0; i < snapshot.data.data.length; i++) {
-                            total += snapshot.data.data[i]["money"];
-                          }
+                  child: Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      /** 貯金額と目標達成率 */
+                      FutureBuilder<ApiResults>(
+                        future: res,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            var total = 0;
+                            var goal = 1000;
+                            for (var i = 0; i < snapshot.data.data.length; i++) {
+                              total += snapshot.data.data[i]["money"];
+                            }
 
-                          return Stack(
-                              alignment: AlignmentDirectional.center,
-                              children: [
-                                /** 貯金額と目標達成率 */
-                                CustomParameter(
-                                  total: total,
-                                  goal: goal,
-                                  height: deviceHeight,
-                                  width: deviceWidth
-                                ),
-                                /** 履歴画面(下スワイプ) */
-                                AnimatedPositioned(
-                                  duration: Duration(milliseconds: 200),
-                                  bottom: -(deviceHeight / 5 * 4 -swipB ),
-                                  child: GestureDetector(
-                                    onVerticalDragUpdate: (DragUpdateDetails details) {
-                                      setState(() {
-                                        if (details.delta.dy < -10) { //上スワイプ
-                                          swipB = deviceHeight / 5 * 4;
-                                        }
-                                        if (details.delta.dy > 10) { //下スワイプ
-                                          swipB = 50;
-                                        }
-                                      });
-                                    },
-                                    /** 履歴画面 */
-                                    child: Container(
-                                        width: deviceWidth,
-                                        height: deviceHeight / 5 * 4,
-                                        decoration: BoxDecoration(
-                                          color: Colors.brown[500],
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              height: 50,
-                                              alignment: Alignment.topCenter,
-                                              padding: EdgeInsets.only(top: 5),
-                                              child: Container(height: 4,width: 80,
-                                                decoration: BoxDecoration(color: Colors.orangeAccent,borderRadius: BorderRadius.circular(2),),
-                                              ),
-                                            ),
-                                            /** 履歴リスト */
-                                            Container(
-                                            color: Colors.amberAccent,
-                                            width: deviceWidth * 0.9,
-                                            height: deviceHeight / 5 * 4 * 0.7,
-                                            child: ListView.separated(
-                                              itemCount: snapshot.data.data.length,
-                                              itemBuilder: (context, index) {
-                                                return Row(
-                                                  children: [
-                                                    Text(
-                                                      snapshot.data.data[index]["userid"].toString(),
-                                                      style: TextStyle(
-                                                        backgroundColor:Colors.redAccent,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      snapshot
-                                                          .data
-                                                          .data[index]
-                                                              ["datetime"]
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        backgroundColor:
-                                                            Colors.blueAccent,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      snapshot.data
-                                                          .data[index]["money"]
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                        backgroundColor:
-                                                            Colors.greenAccent,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                              separatorBuilder:(context, index) {
-                                                return Divider(height: 5,);
-                                              },
-                                            ),
-                                          ),
-                                          ]
-                                        ),
-                                        
-                                    )
-                                  ),
-                                ),
-                              ]
-                          );
-                        } else if (snapshot.hasError) {
-                          /** サーバーから結果が得られなかったときの処理 */ //TODO ローカル保存もするべきか？
-                          return Text("${snapshot.error}");
-                        }
+                            return CustomParameter(
+                                total: total,
+                                goal: goal,
+                                height: deviceHeight,
+                                width: deviceWidth
+                            );
+                          } else if (snapshot.hasError) {
+                            /** サーバーから結果が得られなかったときの処理 */ //TODO ローカル保存もするべきか？
+                            return Text("${snapshot.error}");
+                          }
                         return CircularProgressIndicator();
                       },
                     ),
+                    /** 履歴画面(下スワイプ) */
+                    AnimatedPositioned(
+                      duration: Duration(milliseconds: 200),
+                      bottom: -(deviceHeight / 5 * 4 -swipB ),
+                      child: GestureDetector(
+                        onVerticalDragUpdate: (DragUpdateDetails details) {
+                          setState(() {
+                            if (details.delta.dy < -10) { //上スワイプ
+                              swipB = deviceHeight / 5 * 4;
+                            }
+                            if (details.delta.dy > 10) { //下スワイプ
+                              swipB = 50;
+                            }
+                          });
+                        },
+                        /** スワイプコンテナ */
+                        child:Container(
+                          width: deviceWidth,
+                          height: deviceHeight / 5 * 4,
+                          decoration: BoxDecoration(
+                            color: Colors.brown[500],
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                height: 50,
+                                alignment: Alignment.topCenter,
+                                padding: EdgeInsets.only(top: 5),
+                                child: Container(height: 4,width: 80,
+                                  decoration: BoxDecoration(color: Colors.orangeAccent,borderRadius: BorderRadius.circular(2),),
+                                ),
+                              ),
+                              /** 履歴 */
+                              FutureBuilder<ApiResults>(
+                                future: res,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return Container(
+                                        color: Colors.amberAccent,
+                                        width: deviceWidth * 0.9,
+                                        height: deviceHeight / 5 * 4 * 0.7,
+                                        child: ListView.separated(
+                                          itemCount: snapshot.data.data.length,
+                                          itemBuilder: (context, index) {
+                                            return Row(
+                                              children: [
+                                                Text(
+                                                  snapshot.data.data[index]["userid"].toString(),
+                                                  style: TextStyle(
+                                                    backgroundColor:Colors.redAccent,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  snapshot.data.data[index]["datetime"].toString(),
+                                                  style: TextStyle(
+                                                    backgroundColor:Colors.blueAccent,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  snapshot.data.data[index]["money"].toString(),
+                                                  style: TextStyle(
+                                                    backgroundColor:Colors.greenAccent,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                          separatorBuilder:(context, index) {
+                                            return Divider(height: 5,);
+                                          },
+                                        )
+                                    );
+                          
+                                  } else if (snapshot.hasError) {
+                                    /** サーバーから結果が得られなかったときの処理 */ //TODO ローカル保存もするべきか？
+                                    return Text("${snapshot.error}");
+                                  }
+                                  return CircularProgressIndicator();
+                                },
+                              ), 
+                            ]
+                          )
+                        ),
+
+                      )
+                    ),
+                  ]
+                  )
+                  
+                  
                   ),
                 
               ],
