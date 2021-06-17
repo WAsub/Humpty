@@ -1,8 +1,10 @@
 import 'dart:developer';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'sqlite.dart';
 
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
@@ -29,6 +31,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     res = fetchApiResults();
+  }
+
+  @override
+  void didChangeDependencies(){
+    super.didChangeDependencies();
+    
   }
 
   @override
@@ -237,19 +245,11 @@ class _MyAppState extends State<MyApp> {
 class ApiResults {
   final String message;
   final List<dynamic> data;
-  // final DateTime datetime;
-  // final String money;
   ApiResults({
     this.message,
     this.data,
-    // this.datetime,
-    // this.money,
   });
   factory ApiResults.fromJson(Map<String, dynamic> json) {
-    var a = json;
-    var c = ApiResults(message: json['message'], data: json['data']);
-    var d = c.data[0]["userid"];
-    var e = c.data.length;
     return ApiResults(message: json['message'], data: json['data']);
   }
 }
@@ -260,8 +260,6 @@ Future<ApiResults> fetchApiResults() async {
   final response = await http.post(url, body: json.encode(request.toJson()), headers: {"Content-Type": "application/json"});
 
   if (response.statusCode == 200) {
-    var b = response.body;
-    var j = json.decode(response.body);
     return ApiResults.fromJson(json.decode(response.body));
   } else {
     throw Exception('Failed');
@@ -270,16 +268,10 @@ Future<ApiResults> fetchApiResults() async {
 
 class SampleRequest {
   final String userid;
-  // final DateTime datetime;
-  // final String money;
   SampleRequest({
     this.userid,
-    // this.datetime,
-    // this.money,
   });
   Map<String, dynamic> toJson() => {
         'userid': userid,
-        // 'datetime': datetime,
-        // 'money': money,
       };
 }
