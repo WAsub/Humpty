@@ -2,7 +2,7 @@
 2021年前期  チーム制作
 ***
 
-[## humpty_tyokin](https://github.com/WAsub/Humpty/edit/main/humpty_tyokin)
+## [humpty_tyokin](https://github.com/WAsub/Humpty/edit/main/humpty_tyokin)
   cotumi スマホアプリ
   2021/06/17現在
   ワイヤーフレームをもとに画面の作成。
