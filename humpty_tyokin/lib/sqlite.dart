@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class Thokin {
-  int id;
+  String id;
   int money;
   String date;
 
