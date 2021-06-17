@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -5,6 +7,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
+
+import 'customParameter.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,7 +22,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Future<ApiResults> res;
 
-  double swipH = -100;
+  double swipB = 30;
+  int total = 0;
+  int goal = 0;
   @override
   void initState() {
     super.initState();
@@ -95,202 +101,137 @@ class _MyAppState extends State<MyApp> {
                     height: 29.124,
                     width: 110,
                     // alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.blueAccent),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.monetization_on_outlined),
-                          Text(
-                            "現在高",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ]),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.blueAccent),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Icon(Icons.monetization_on_outlined),
+                      Text(
+                        "現在高",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ]),
                   ),
                 ),
                 Container(
-                  height: deviceHeight - 50,
-                  alignment: Alignment.center,
-                  color: Colors.greenAccent,
-                  child: Container(
-                    child: FutureBuilder<ApiResults>(
-                      future: res,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          var total = 0;
-                          var goal = 1000;
-                          for (var i = 0; i < snapshot.data.data.length; i++) {
-                            total += snapshot.data.data[i]["money"];
-                          }
-                          var par = total / goal;
+                    height: deviceHeight - 50,
+                    alignment: Alignment.center,
+                    color: Colors.greenAccent,
+                    child: Stack(alignment: AlignmentDirectional.center, children: [
+                      /** 貯金額と目標達成率 */
+                      FutureBuilder<ApiResults>(
+                        future: res,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            var total = 0;
+                            var goal = 1000;
+                            for (var i = 0; i < snapshot.data.data.length; i++) {
+                              total += snapshot.data.data[i]["money"];
+                            }
 
-                          return Stack(
-                              alignment: AlignmentDirectional.center,
-                              children: [
-                                /** どのぐらい目標達成したか */
-                                Container(
-                                  height: deviceHeight,
-                                  width: deviceWidth,
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    height: 300,
-                                    width: 300,
-                                    child: CustomPaint(
-                                      size: Size(deviceWidth, deviceHeight),
-                                      painter: CirclePainter(par: par),
+                            return CustomParameter(total: total, goal: goal, height: deviceHeight, width: deviceWidth);
+                          } else if (snapshot.hasError) {
+                            /** サーバーから結果が得られなかったときの処理 */ //TODO ローカル保存もするべきか？
+                            return Text("${snapshot.error}");
+                          }
+                          return CircularProgressIndicator();
+                        },
+                      ),
+                      /** 履歴画面(下スワイプ) */
+                      AnimatedPositioned(
+                          duration: Duration(milliseconds: 200),
+                          bottom: -(deviceHeight / 5 * 4 - swipB),
+                          child: GestureDetector(
+                            onVerticalDragUpdate: (DragUpdateDetails details) {
+                              setState(() {
+                                if (details.delta.dy < -10) {
+                                  //上スワイプ
+                                  swipB = deviceHeight / 5 * 4 - 20;
+                                }
+                                if (details.delta.dy > 10) {
+                                  //下スワイプ
+                                  swipB = 30;
+                                }
+                              });
+                            },
+                            /** スワイプコンテナ */
+                            child: Container(
+                                width: deviceWidth,
+                                height: deviceHeight / 5 * 4 + 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.brown[500],
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Column(children: [
+                                  Container(
+                                    height: 50,
+                                    alignment: Alignment.topCenter,
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: Container(
+                                      height: 4,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        color: Colors.orangeAccent,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                /** 数字類 */
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    /** 貯金額 */
-                                    Text(
-                                      total.toString(),
-                                      style: TextStyle(
-                                          fontSize: 60,
-                                          fontWeight: FontWeight.w200),
-                                    ),
-                                    /** アイコンと目標額 */
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.flag),
-                                        Text(goal.toString())
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                /** 履歴画面(下スワイプ) */
-                                AnimatedPositioned(
-                                  duration: Duration(milliseconds: 200),
-                                  top: deviceHeight + swipH,
-                                  child: GestureDetector(
-                                    onVerticalDragUpdate:
-                                        (DragUpdateDetails details) {
-                                      setState(() {
-                                        if (details.delta.dy < -10) {
-                                          var dy = deviceHeight / 5 * 4.5;
-                                          swipH = dy - dy - dy;
-                                        }
-                                        if (details.delta.dy > 10) {
-                                          swipH = -100;
-                                        }
-                                      });
-                                    },
-                                    /** 履歴画面 */
-                                    child: Container(
-                                        color: Colors.brown[500],
-                                        width: deviceWidth,
-                                        height: deviceHeight / 5 * 4.5,
-                                        child: Center(
-                                          child: Container(
+                                  /** 履歴 */
+                                  FutureBuilder<ApiResults>(
+                                    future: res,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        return Container(
                                             color: Colors.amberAccent,
                                             width: deviceWidth * 0.9,
-                                            height:
-                                                deviceHeight / 5 * 4.5 * 0.7,
+                                            height: deviceHeight / 5 * 4 * 0.7,
                                             child: ListView.separated(
-                                              itemCount:
-                                                  snapshot.data.data.length,
+                                              itemCount: snapshot.data.data.length,
                                               itemBuilder: (context, index) {
-                                                debugPrint(
-                                                    deviceHeight.toString());
                                                 return Row(
                                                   children: [
                                                     Text(
-                                                      snapshot.data
-                                                          .data[index]["userid"]
-                                                          .toString(),
+                                                      snapshot.data.data[index]["userid"].toString(),
                                                       style: TextStyle(
-                                                        backgroundColor:
-                                                            Colors.redAccent,
+                                                        backgroundColor: Colors.redAccent,
                                                       ),
                                                     ),
                                                     Text(
-                                                      snapshot
-                                                          .data
-                                                          .data[index]
-                                                              ["datetime"]
-                                                          .toString(),
+                                                      snapshot.data.data[index]["datetime"].toString(),
                                                       style: TextStyle(
-                                                        backgroundColor:
-                                                            Colors.blueAccent,
+                                                        backgroundColor: Colors.blueAccent,
                                                       ),
                                                     ),
                                                     Text(
-                                                      snapshot.data
-                                                          .data[index]["money"]
-                                                          .toString(),
+                                                      snapshot.data.data[index]["money"].toString(),
                                                       style: TextStyle(
-                                                        backgroundColor:
-                                                            Colors.greenAccent,
+                                                        backgroundColor: Colors.greenAccent,
                                                       ),
                                                     ),
                                                   ],
                                                 );
                                               },
-                                              separatorBuilder:
-                                                  (context, index) {
+                                              separatorBuilder: (context, index) {
                                                 return Divider(
                                                   height: 5,
                                                 );
                                               },
-                                            ),
-                                          ),
-                                        )),
+                                            ));
+                                      } else if (snapshot.hasError) {
+                                        /** サーバーから結果が得られなかったときの処理 */ //TODO ローカル保存もするべきか？
+                                        return Text("${snapshot.error}");
+                                      }
+                                      return CircularProgressIndicator(
+                                        value: 0.5,
+                                      );
+                                    },
                                   ),
-                                ),
-                              ]);
-                        } else if (snapshot.hasError) {
-                          /** サーバーから結果が得られなかったときの処理 */ //TODO ローカル保存もするべきか？
-                          return Text("${snapshot.error}");
-                        }
-                        return CircularProgressIndicator();
-                      },
-                    ),
-                  ),
-                ),
+                                ])),
+                          )),
+                    ])),
               ],
             );
           }),
         ));
   }
-}
-
-class CirclePainter extends CustomPainter {
-  final double par;
-  CirclePainter({
-    this.par,
-  });
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Rect.fromLTRB(20, 20, 280, 280);
-    final startAngle = -60 * math.pi / 180;
-    final sweepAngle = 300 * math.pi / 180;
-    final useCenter = false;
-    final paint = Paint()
-      ..color = Colors.pinkAccent
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 28
-      ..strokeCap = StrokeCap.round;
-    canvas.drawArc(rect, startAngle, sweepAngle, useCenter, paint);
-
-    final paint2 = Paint()
-      ..color = Colors.purpleAccent
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 28
-      ..strokeCap = StrokeCap.round;
-    final sweepAngle2 = 300 * math.pi / 180 * par;
-    canvas.drawArc(rect, startAngle, sweepAngle2, useCenter, paint2);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
 
 class ApiResults {
@@ -316,9 +257,7 @@ class ApiResults {
 Future<ApiResults> fetchApiResults() async {
   var url = "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php";
   var request = new SampleRequest(userid: "abc");
-  final response = await http.post(url,
-      body: json.encode(request.toJson()),
-      headers: {"Content-Type": "application/json"});
+  final response = await http.post(url, body: json.encode(request.toJson()), headers: {"Content-Type": "application/json"});
 
   if (response.statusCode == 200) {
     var b = response.body;
