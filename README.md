@@ -9,7 +9,7 @@
   HTTP通信にてサーバーからデータを引き出し表示させることは成功。
 ***
 
-## humpty_sumple_gesturedetector
+## [humpty_sumple_gesturedetector](https://github.com/WAsub/Humpty/edit/main/humpty_sumple_gesturedetector)
 
   カスタムウィジェット等を作る際に試す用のプログラム。
   テスト用プログラム。
