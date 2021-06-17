@@ -11,6 +11,10 @@ HTTP通信用のメソッドは今後他のファイルに分けるかも。
 ### [sqlite.dart](https://github.com/WAsub/Humpty/blob/main/humpty_tyokin/lib/sqlite.dart)
 ローカル保存用データベース関連。
 
+### [lib/theme](https://github.com/WAsub/Humpty/blob/main/humpty_tyokin/lib/theme)
+テーマカラーなどウィジェットの色関連。  
+参考資料: [Flutterでカラーテーマを動的に変更する](https://naotech.hatenablog.com/entry/2019/05/04/131919)
+
 ### SwipeContainer
 未使用。多分後で消す。
 
