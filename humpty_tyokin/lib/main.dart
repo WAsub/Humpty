@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'theme/dynamic_theme.dart';
@@ -8,19 +6,12 @@ import 'dart:convert';
 import 'sqlite.dart';
 
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 
 import 'customParameter.dart';
 
 void main() => runApp(MyApp());
 
-// class MyApp extends StatefulWidget {
-//   MyApp({Key key}) : super(key: key);
-
-//   @override
-//   _MyAppState createState() => _MyAppState();
-// }
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -55,21 +46,26 @@ class _CotsumiState extends State<Cotsumi> {
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
+    /** サーバーからデータを取得 */
     httpRes = await fetchApiResults();
-    List<Thokin> thokin=[];
-    for(int i = 0; i < httpRes.data.length; i++){
-      thokin.add(Thokin(
-        id: httpRes.data[i]["userid"],
-        date: httpRes.data[i]["datetime"],
-        money: httpRes.data[i]["money"],
-      ));
+    /** データを取得できたらローカルのデータを入れ替え */
+    if(httpRes.message != "Failed"){
+      List<Thokin> thokin=[];
+      for(int i = 0; i < httpRes.data.length; i++){
+        thokin.add(Thokin(
+          id: httpRes.data[i]["userid"],
+          date: httpRes.data[i]["datetime"],
+          money: httpRes.data[i]["money"],
+        ));
+      }
+      await SQLite.deleteThokin();
+      print(await SQLite.getThokin());
+      await SQLite.insertThokin(thokin);
     }
-    await SQLite.deleteThokin();
-    print(await SQLite.getThokin());
-    await SQLite.insertThokin(thokin);
+    /** データを取得 */
     List<Thokin> getlist = [];
     getlist = await SQLite.getThokin();
-    
+    /** データをセット */
     setState(() {
       _thokinData = getlist;
       for(int i = 0; i < _thokinData.length; i++){
@@ -79,6 +75,36 @@ class _CotsumiState extends State<Cotsumi> {
     print(httpRes.data);
     print(_thokinData);
 
+  }
+  Future<void> reload() async {
+    /** サーバーからデータを取得 */
+    httpRes = await fetchApiResults();
+    /** データを取得できたらローカルのデータを入れ替え */
+    if(httpRes.message != "Failed"){
+      List<Thokin> thokin=[];
+      for(int i = 0; i < httpRes.data.length; i++){
+        thokin.add(Thokin(
+          id: httpRes.data[i]["userid"],
+          date: httpRes.data[i]["datetime"],
+          money: httpRes.data[i]["money"],
+        ));
+      }
+      await SQLite.deleteThokin();
+      print(await SQLite.getThokin());
+      await SQLite.insertThokin(thokin);
+    }
+    /** データを取得 */
+    List<Thokin> getlist = [];
+    getlist = await SQLite.getThokin();
+    /** データをセット */
+    setState(() {
+      _thokinData = getlist;
+      for(int i = 0; i < _thokinData.length; i++){
+        total +=_thokinData[i].money;
+      }
+    });
+    print(httpRes.data);
+    print(_thokinData);
   }
 
   @override
@@ -100,6 +126,12 @@ class _CotsumiState extends State<Cotsumi> {
     return Scaffold(
           appBar: AppBar(
             title: Text('こつみ cotsumi'),
+            actions: [
+              IconButton(onPressed: () async{
+                reload();
+              }, 
+              icon: Icon(Icons.autorenew_sharp)),
+            ],
           ),
           /******************************************************* AppBar*/
           drawer: Drawer(
@@ -263,6 +295,9 @@ class ApiResults {
     this.message,
     this.data,
   });
+  factory ApiResults.errorMsg(String msg) {
+    return ApiResults(message: msg, data: null);
+  }
   factory ApiResults.fromJson(Map<String, dynamic> json) {
     return ApiResults(message: json['message'], data: json['data']);
   }
@@ -276,7 +311,8 @@ Future<ApiResults> fetchApiResults() async {
   if (response.statusCode == 200) {
     return ApiResults.fromJson(json.decode(response.body));
   } else {
-    throw Exception('Failed');
+    return ApiResults.errorMsg("Failed");
+    // throw Exception('Failed');
   }
 }
 
