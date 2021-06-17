@@ -32,6 +32,7 @@ dependencies:
 
   # 2021/6/17
   sqflite:
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:

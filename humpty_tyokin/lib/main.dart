@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'theme/dynamic_theme.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'sqlite.dart';
@@ -14,29 +15,70 @@ import 'customParameter.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
-  MyApp({Key key}) : super(key: key);
+// class MyApp extends StatefulWidget {
+//   MyApp({Key key}) : super(key: key);
 
+//   @override
+//   _MyAppState createState() => _MyAppState();
+// }
+class MyApp extends StatelessWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return DynamicTheme(
+      themedWidgetBuilder: (context, theme) {
+        return MaterialApp(
+          theme: theme,
+          home: Cotsumi(),
+        );
+      },
+    );
+  }
+}
+class Cotsumi extends StatefulWidget {
+  @override
+  _CotsumiState createState() => _CotsumiState();
 }
 
-class _MyAppState extends State<MyApp> {
-  Future<ApiResults> res;
+class _CotsumiState extends State<Cotsumi> {
+  ApiResults httpRes;
+  List<Thokin> _thokinData = [];
 
   double swipB = 30;
   int total = 0;
-  int goal = 0;
+  int goal = 1000;
   @override
   void initState() {
     super.initState();
-    res = fetchApiResults();
   }
 
+  /** 初期化処理 */
   @override
-  void didChangeDependencies(){
+  Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
+    httpRes = await fetchApiResults();
+    List<Thokin> thokin=[];
+    for(int i = 0; i < httpRes.data.length; i++){
+      thokin.add(Thokin(
+        id: httpRes.data[i]["userid"],
+        date: httpRes.data[i]["datetime"],
+        money: httpRes.data[i]["money"],
+      ));
+    }
+    await SQLite.deleteThokin();
+    print(await SQLite.getThokin());
+    await SQLite.insertThokin(thokin);
+    List<Thokin> getlist = [];
+    getlist = await SQLite.getThokin();
     
+    setState(() {
+      _thokinData = getlist;
+      for(int i = 0; i < _thokinData.length; i++){
+        total +=_thokinData[i].money;
+      }
+    });
+    print(httpRes.data);
+    print(_thokinData);
+
   }
 
   @override
@@ -55,12 +97,7 @@ class _MyAppState extends State<MyApp> {
       Text("アカウント設定"),
     ];
     // var onTap = [null, PastRecord(), SetLine(), SetTheme(), Config(),];
-    return MaterialApp(
-        title: 'APIをPOSTで呼び出しJSONパラメータを渡す',
-        theme: ThemeData(
-          primarySwatch: Colors.yellow,
-        ),
-        home: Scaffold(
+    return Scaffold(
           appBar: AppBar(
             title: Text('こつみ cotsumi'),
           ),
@@ -125,23 +162,11 @@ class _MyAppState extends State<MyApp> {
                     color: Colors.greenAccent,
                     child: Stack(alignment: AlignmentDirectional.center, children: [
                       /** 貯金額と目標達成率 */
-                      FutureBuilder<ApiResults>(
-                        future: res,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            var total = 0;
-                            var goal = 1000;
-                            for (var i = 0; i < snapshot.data.data.length; i++) {
-                              total += snapshot.data.data[i]["money"];
-                            }
-
-                            return CustomParameter(total: total, goal: goal, height: deviceHeight, width: deviceWidth);
-                          } else if (snapshot.hasError) {
-                            /** サーバーから結果が得られなかったときの処理 */ //TODO ローカル保存もするべきか？
-                            return Text("${snapshot.error}");
-                          }
-                          return CircularProgressIndicator();
-                        },
+                      CustomParameter(
+                        total: total, 
+                        goal: goal, 
+                        height: deviceHeight, 
+                        width: deviceWidth
                       ),
                       /** 履歴画面(下スワイプ) */
                       AnimatedPositioned(
@@ -183,62 +208,51 @@ class _MyAppState extends State<MyApp> {
                                     ),
                                   ),
                                   /** 履歴 */
-                                  FutureBuilder<ApiResults>(
-                                    future: res,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        return Container(
-                                            color: Colors.amberAccent,
-                                            width: deviceWidth * 0.9,
-                                            height: deviceHeight / 5 * 4 * 0.7,
-                                            child: ListView.separated(
-                                              itemCount: snapshot.data.data.length,
-                                              itemBuilder: (context, index) {
-                                                return Row(
-                                                  children: [
-                                                    Text(
-                                                      snapshot.data.data[index]["userid"].toString(),
-                                                      style: TextStyle(
-                                                        backgroundColor: Colors.redAccent,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      snapshot.data.data[index]["datetime"].toString(),
-                                                      style: TextStyle(
-                                                        backgroundColor: Colors.blueAccent,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      snapshot.data.data[index]["money"].toString(),
-                                                      style: TextStyle(
-                                                        backgroundColor: Colors.greenAccent,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                              separatorBuilder: (context, index) {
-                                                return Divider(
-                                                  height: 5,
-                                                );
-                                              },
-                                            ));
-                                      } else if (snapshot.hasError) {
-                                        /** サーバーから結果が得られなかったときの処理 */ //TODO ローカル保存もするべきか？
-                                        return Text("${snapshot.error}");
-                                      }
-                                      return CircularProgressIndicator(
-                                        value: 0.5,
-                                      );
-                                    },
+                                  Container(
+                                    color: Colors.amberAccent,
+                                    width: deviceWidth * 0.9,
+                                    height: deviceHeight / 5 * 4 * 0.7,
+                                    child: ListView.separated(
+                                      itemCount: _thokinData.length,
+                                      itemBuilder: (context, index) {
+                                        return Row(
+                                            children: [
+                                              Text(
+                                                _thokinData[index].id.toString(),
+                                                style: TextStyle(
+                                                  backgroundColor: Colors.redAccent,
+                                                ),
+                                              ),
+                                              Text(
+                                                _thokinData[index].date.toString(),
+                                                style: TextStyle(
+                                                  backgroundColor: Colors.blueAccent,
+                                                ),
+                                              ),
+                                              Text(
+                                                _thokinData[index].money.toString(),
+                                                style: TextStyle(
+                                                  backgroundColor: Colors.greenAccent,
+                                                ),
+                                              ),
+                                            ],
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) {
+                                        return Divider(
+                                          height: 5,
+                                        );
+                                      },
+                                    )
                                   ),
+                                  
                                 ])),
                           )),
                     ])),
               ],
             );
           }),
-        ));
+        );
   }
 }
 
