@@ -1,16 +1,13 @@
 # humpty_tyokin
+本番用プログラム
+***
+### lib/main.dart
+メイン画面  
+HTTP通信用のメソッドは今後他のファイルに分けるかも。
 
-A new Flutter application.
+### lib/CustomParameter.dart
+貯金額と目標達成率のグラフのカスタムウィジェット
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+***
+#### 2021/06/17
+現状ほとんどガワしか作っていません。
