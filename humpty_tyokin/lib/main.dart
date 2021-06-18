@@ -4,11 +4,14 @@ import 'theme/dynamic_theme.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'sqlite.dart';
+import 'package:async/async.dart';
 
-import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import 'customParameter.dart';
+
+import 'package:humpty_tyokin/createAccount.dart';
 
 void main() => runApp(MyApp());
 
@@ -31,80 +34,74 @@ class Cotsumi extends StatefulWidget {
 }
 
 class _CotsumiState extends State<Cotsumi> {
+  /** HTTP通信 */
   ApiResults httpRes;
+  /** ローカルデータベースから抽出したデータ */
   List<Thokin> _thokinData = [];
-
   double swipB = 30;
   int total = 0;
   int goal = 1000;
+  /** 初期化を一回だけするためのライブラリ */
+  final AsyncMemoizer memoizer= AsyncMemoizer();
+  /** 端末にデータを保存する奴 */
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   void initState() {
     super.initState();
+    /** 初回起動時のアカウント作成 */
+    getlogin();
+  }
+  getlogin() async {
+    final SharedPreferences prefs = await _prefs;
+    // final int login = (prefs.getInt('MyAccount') ?? 0) + 1;
+    final bool login = (prefs.getBool('login') ?? false);
+    if(!login){
+      Navigator .of(context).push(
+        MaterialPageRoute(builder: (context) {
+          // ログイン画面へ
+          return CreateAccount();}),
+      ).then((value) async{
+        // reload();
+      });
+    }
   }
 
   /** 初期化処理 */
-  @override
-  Future<void> didChangeDependencies() async {
-    super.didChangeDependencies();
-    /** サーバーからデータを取得 */
-    httpRes = await fetchApiResults();
-    /** データを取得できたらローカルのデータを入れ替え */
-    if(httpRes.message != "Failed"){
-      List<Thokin> thokin=[];
-      for(int i = 0; i < httpRes.data.length; i++){
-        thokin.add(Thokin(
-          id: httpRes.data[i]["userid"],
-          date: httpRes.data[i]["datetime"],
-          money: httpRes.data[i]["money"],
-        ));
-      }
-      await SQLite.deleteThokin();
-      print(await SQLite.getThokin());
-      await SQLite.insertThokin(thokin);
-    }
-    /** データを取得 */
-    List<Thokin> getlist = [];
-    getlist = await SQLite.getThokin();
-    /** データをセット */
-    setState(() {
-      _thokinData = getlist;
-      for(int i = 0; i < _thokinData.length; i++){
-        total +=_thokinData[i].money;
-      }
-    });
-    print(httpRes.data);
-    print(_thokinData);
-
-  }
   Future<void> reload() async {
-    /** サーバーからデータを取得 */
-    httpRes = await fetchApiResults();
-    /** データを取得できたらローカルのデータを入れ替え */
-    if(httpRes.message != "Failed"){
-      List<Thokin> thokin=[];
-      for(int i = 0; i < httpRes.data.length; i++){
-        thokin.add(Thokin(
-          id: httpRes.data[i]["userid"],
-          date: httpRes.data[i]["datetime"],
-          money: httpRes.data[i]["money"],
-        ));
-      }
-      await SQLite.deleteThokin();
-      print(await SQLite.getThokin());
-      await SQLite.insertThokin(thokin);
-    }
-    /** データを取得 */
-    List<Thokin> getlist = [];
-    getlist = await SQLite.getThokin();
-    /** データをセット */
-    setState(() {
-      _thokinData = getlist;
-      for(int i = 0; i < _thokinData.length; i++){
-        total +=_thokinData[i].money;
-      }
-    });
-    print(httpRes.data);
-    print(_thokinData);
+    memoizer.runOnce(
+      () async {
+        /** サーバーからデータを取得 */
+        httpRes = await fetchApiResults();
+        /** データを取得できたらローカルのデータを入れ替え */
+        if(httpRes.message != "Failed"){
+          List<Thokin> thokin=[];
+          for(int i = 0; i < httpRes.data.length; i++){
+            thokin.add(Thokin(
+              id: httpRes.data[i]["userid"],
+              date: httpRes.data[i]["datetime"],
+              money: httpRes.data[i]["money"],
+            ));
+          }
+          await SQLite.deleteThokin();
+          // print(await SQLite.getThokin());
+          await SQLite.insertThokin(thokin);
+        }
+        /** データを取得 */
+        List<Thokin> getlist = [];
+        getlist = await SQLite.getThokin();
+        /** データをセット */
+        setState(() {
+          _thokinData = getlist;
+          total = 0;
+          for(int i = 0; i < _thokinData.length; i++){
+            total +=_thokinData[i].money;
+          }
+        });
+        print(httpRes.data);
+        print(_thokinData);
+      },
+    );
   }
 
   @override
@@ -277,10 +274,21 @@ class _CotsumiState extends State<Cotsumi> {
                                       },
                                     )
                                   ),
-                                  
                                 ])),
                           )),
-                    ])),
+                      /** ロード */
+                      FutureBuilder(
+                        future: reload(),
+                        builder: (context, snapshot) {
+                          // 非同期処理未完了 = 通信中
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator(),);
+                          }
+                          return Center();
+                        },
+                      ),
+                    ])
+                ),
               ],
             );
           }),

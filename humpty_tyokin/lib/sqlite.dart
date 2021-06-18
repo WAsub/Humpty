@@ -17,7 +17,7 @@ class Thokin {
   }
   @override
   String toString() {
-    return 'Memo{id: $id, date: $date, money: $money}';
+    return 'Thokin{id: $id, date: $date, money: $money}';
   }
 }
 
