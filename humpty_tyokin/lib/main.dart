@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'customParameter.dart';
 
 import 'package:humpty_tyokin/createAccount.dart';
+import 'package:humpty_tyokin/apiResults.dart';
 
 void main() => runApp(MyApp());
 
@@ -55,7 +56,7 @@ class _CotsumiState extends State<Cotsumi> {
   getlogin() async {
     final SharedPreferences prefs = await _prefs;
     // final int login = (prefs.getInt('MyAccount') ?? 0) + 1;
-    final bool login = (prefs.getBool('login') ?? false);
+    final bool login = (prefs.getBool('first') ?? false);
     if(!login){
       Navigator .of(context).push(
         MaterialPageRoute(builder: (context) {
@@ -72,7 +73,10 @@ class _CotsumiState extends State<Cotsumi> {
     memoizer.runOnce(
       () async {
         /** サーバーからデータを取得 */
-        httpRes = await fetchApiResults();
+        httpRes = await fetchApiResults(
+          "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+          new SampleRequest(userid: "abc").toJson()
+        );
         /** データを取得できたらローカルのデータを入れ替え */
         if(httpRes.message != "Failed"){
           List<Thokin> thokin=[];
@@ -296,33 +300,33 @@ class _CotsumiState extends State<Cotsumi> {
   }
 }
 
-class ApiResults {
-  final String message;
-  final List<dynamic> data;
-  ApiResults({
-    this.message,
-    this.data,
-  });
-  factory ApiResults.errorMsg(String msg) {
-    return ApiResults(message: msg, data: null);
-  }
-  factory ApiResults.fromJson(Map<String, dynamic> json) {
-    return ApiResults(message: json['message'], data: json['data']);
-  }
-}
+// class ApiResults {
+//   final String message;
+//   final List<dynamic> data;
+//   ApiResults({
+//     this.message,
+//     this.data,
+//   });
+//   factory ApiResults.errorMsg(String msg) {
+//     return ApiResults(message: msg, data: null);
+//   }
+//   factory ApiResults.fromJson(Map<String, dynamic> json) {
+//     return ApiResults(message: json['message'], data: json['data']);
+//   }
+// }
 
-Future<ApiResults> fetchApiResults() async {
-  var url = "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php";
-  var request = new SampleRequest(userid: "abc");
-  final response = await http.post(url, body: json.encode(request.toJson()), headers: {"Content-Type": "application/json"});
+// Future<ApiResults> fetchApiResults() async {
+//   var url = "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php";
+//   var request = new SampleRequest(userid: "abc");
+//   final response = await http.post(url, body: json.encode(request.toJson()), headers: {"Content-Type": "application/json"});
 
-  if (response.statusCode == 200) {
-    return ApiResults.fromJson(json.decode(response.body));
-  } else {
-    return ApiResults.errorMsg("Failed");
-    // throw Exception('Failed');
-  }
-}
+//   if (response.statusCode == 200) {
+//     return ApiResults.fromJson(json.decode(response.body));
+//   } else {
+//     return ApiResults.errorMsg("Failed");
+//     // throw Exception('Failed');
+//   }
+// }
 
 class SampleRequest {
   final String userid;
