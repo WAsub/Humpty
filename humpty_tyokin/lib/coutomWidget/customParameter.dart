@@ -5,17 +5,29 @@ import 'dart:math' as math;
 class CustomParameter extends StatelessWidget{
   final int total;
   final int goal;
-  final double height;
-  final double width;
+  double height;
+  double width;
+  Color backcolor;
   CustomParameter({
     this.total,
     this.goal,
     this.height,
     this.width,
+    this.backcolor,
   });
 
   @override
   Widget build(BuildContext context) {
+    if(height == null){
+      height = 300;
+    }
+    if(width == null){
+      width = 300;
+    }
+    if(backcolor == null){
+      backcolor = Colors.blue;
+    }
+
     final double parsent = total / goal;
 
     return Stack(
@@ -26,8 +38,9 @@ class CustomParameter extends StatelessWidget{
             width: width,
             alignment: Alignment.center,
             child: Container(
-              height: 300,
-              width: 300,
+              color: Colors.blueAccent[100],
+              height: height,
+              width: width,
               child: CustomPaint(
                 size: Size(width, height),
                 painter: CirclePainter(par: parsent),
@@ -64,22 +77,28 @@ class CustomParameter extends StatelessWidget{
 }
 
 class CirclePainter extends CustomPainter {
+  Color backcolor;
   final double par;
   CirclePainter({
+    this.backcolor,
     this.par,
   });
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = Rect.fromLTRB(20, 20, 280, 280);
+    if(backcolor == null){
+      backcolor = Colors.blue;
+    }
+
+
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final startAngle = -60 * math.pi / 180;
     final sweepAngle = 300 * math.pi / 180;
-    final useCenter = false;
     final paint = Paint()
-      ..color = Colors.pinkAccent
+      ..color = backcolor 
       ..style = PaintingStyle.stroke
       ..strokeWidth = 28
       ..strokeCap = StrokeCap.round;
-    canvas.drawArc(rect, startAngle, sweepAngle, useCenter, paint);
+    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
 
     final paint2 = Paint()
       ..color = Colors.purpleAccent
@@ -87,7 +106,7 @@ class CirclePainter extends CustomPainter {
       ..strokeWidth = 28
       ..strokeCap = StrokeCap.round;
     final sweepAngle2 = 300 * math.pi / 180 * par;
-    canvas.drawArc(rect, startAngle, sweepAngle2, useCenter, paint2);
+    canvas.drawArc(rect, startAngle, sweepAngle2, false, paint2);
   }
 
   @override

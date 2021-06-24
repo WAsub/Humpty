@@ -9,7 +9,7 @@ import 'package:async/async.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-import 'customParameter.dart';
+import 'coutomWidget/customParameter.dart';
 
 import 'package:humpty_tyokin/createAccount.dart';
 import 'package:humpty_tyokin/apiResults.dart';
@@ -56,8 +56,8 @@ class _CotsumiState extends State<Cotsumi> {
   getlogin() async {
     final SharedPreferences prefs = await _prefs;
     // final int login = (prefs.getInt('MyAccount') ?? 0) + 1;
-    final bool login = (prefs.getBool('first') ?? false);
-    if(!login){
+    final bool first = (prefs.getBool('first') ?? false);
+    if(!first){
       Navigator .of(context).push(
         MaterialPageRoute(builder: (context) {
           // ログイン画面へ
@@ -175,20 +175,50 @@ class _CotsumiState extends State<Cotsumi> {
                   height: 50,
                   color: Colors.redAccent,
                   alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: 29.124,
-                    width: 110,
-                    // alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.blueAccent),
-                    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Icon(Icons.monetization_on_outlined),
-                      Text(
-                        "現在高",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:[
+                      // ignore: deprecated_member_use
+                      FlatButton(
+                        height: 29.124,
+                        minWidth: 100,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(Icons.monetization_on_outlined),
+                          Text(
+                            "現在高",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ]),
+                        color: Colors.white,
+                        shape: StadiumBorder(),
+                        onPressed: () {
+                        
+                        },
                       ),
-                    ]),
+                      // ignore: deprecated_member_use
+                      FlatButton(
+                        height: 29.124,
+                        minWidth: 100,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(Icons.monetization_on_outlined),
+                          Text(
+                            "現在高",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ]),
+                        color: Colors.white,
+                        shape: StadiumBorder(),
+                        onPressed: () {
+                        
+                        },
+                      ),
+                    ]
                   ),
                 ),
+
                 Container(
                     height: deviceHeight - 50,
                     alignment: Alignment.center,
@@ -198,8 +228,8 @@ class _CotsumiState extends State<Cotsumi> {
                       CustomParameter(
                         total: total, 
                         goal: goal, 
-                        height: deviceHeight, 
-                        width: deviceWidth
+                        // height: deviceHeight, 
+                        // width: deviceWidth
                       ),
                       /** 履歴画面(下スワイプ) */
                       AnimatedPositioned(

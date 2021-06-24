@@ -3,8 +3,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-
-
 class ApiResults {
   final String message;
   final List<dynamic> data;
