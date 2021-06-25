@@ -51,7 +51,7 @@ class _CotsumiState extends State<Cotsumi> {
   void initState() {
     super.initState();
     /** 初回起動時のアカウント作成 */
-    getlogin();
+    // getlogin();
   }
   getlogin() async {
     final SharedPreferences prefs = await _prefs;
@@ -226,7 +226,7 @@ class _CotsumiState extends State<Cotsumi> {
                     child: Stack(alignment: AlignmentDirectional.center, children: [
                       /** 貯金額と目標達成率 */
                       CustomParameter(
-                        total: total, 
+                        current: total, 
                         goal: goal, 
                         // height: deviceHeight, 
                         // width: deviceWidth

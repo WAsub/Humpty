@@ -3,49 +3,49 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 class CustomParameter extends StatelessWidget{
-  final int total;
-  final int goal;
+  double strokeWidth;
+  int current;
+  Color currentColor;
+  int goal;
+  Color goalColor;
   double height;
   double width;
+  Color color;
   Color backcolor;
   CustomParameter({
-    this.total,
+    this.strokeWidth,
+    this.current,
+    this.currentColor,
     this.goal,
+    this.goalColor,
     this.height,
     this.width,
+    this.color,
     this.backcolor,
   });
 
   @override
   Widget build(BuildContext context) {
-    if(height == null){
-      height = 300;
-    }
-    if(width == null){
-      width = 300;
-    }
-    if(backcolor == null){
-      backcolor = Colors.blue;
-    }
+    if(strokeWidth == null){ strokeWidth = 28;}
+    if(height == null){ height = 300;}
+    if(width == null){ width = 300;}
+    if(color == null){ color = Colors.blue;}
+    if(backcolor == null){ backcolor = Colors.blueAccent[100];}
+    currentColor = currentColor == null ? Colors.black : currentColor;
+    goalColor = goalColor == null ? Colors.black : goalColor;
 
-    final double parsent = total / goal;
+    final double parsent = current / goal;
 
     return Stack(
         alignment: AlignmentDirectional.center,
         children: [
-          Container(
-            height: height,
-            width: width,
-            alignment: Alignment.center,
-            child: Container(
-              color: Colors.blueAccent[100],
-              height: height,
-              width: width,
-              child: CustomPaint(
-                size: Size(width, height),
-                painter: CirclePainter(par: parsent),
-              ),
-            ),
+          CustomPaint(
+            size: Size(width, height),
+            painter: CirclePainter(
+              strokeWidth: this.strokeWidth,
+              color: this.color,
+              backcolor: this.backcolor,
+              par: parsent),
           ),
           /** 数字類 */
           Column(
@@ -54,8 +54,9 @@ class CustomParameter extends StatelessWidget{
             children: [
               /** 貯金額 */
               Text(
-                total.toString(),
+                current.toString(),
                 style: TextStyle(
+                  color: currentColor,
                   fontSize: 60,
                   fontWeight: FontWeight.w200),
                 ),
@@ -64,7 +65,7 @@ class CustomParameter extends StatelessWidget{
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.flag),
-                  Text(goal.toString())
+                  Text(goal.toString(),style: TextStyle(color: goalColor),)
                 ],
               ),
             ],
@@ -77,36 +78,35 @@ class CustomParameter extends StatelessWidget{
 }
 
 class CirclePainter extends CustomPainter {
+  double strokeWidth;
+  Color color;
   Color backcolor;
   final double par;
   CirclePainter({
+    this.strokeWidth,
+    this.color,
     this.backcolor,
     this.par,
   });
   @override
   void paint(Canvas canvas, Size size) {
-    if(backcolor == null){
-      backcolor = Colors.blue;
-    }
-
-
-    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    Paint paint = Paint()
+      ..color = this.backcolor 
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = this.strokeWidth
+      ..strokeCap = StrokeCap.round;
+    final rect = Rect.fromLTWH(strokeWidth / 2, strokeWidth / 2, size.width - strokeWidth, size.height - strokeWidth);
     final startAngle = -60 * math.pi / 180;
     final sweepAngle = 300 * math.pi / 180;
-    final paint = Paint()
-      ..color = backcolor 
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 28
-      ..strokeCap = StrokeCap.round;
     canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
 
-    final paint2 = Paint()
-      ..color = Colors.purpleAccent
+    paint = new Paint()
+      ..color = this.color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 28
+      ..strokeWidth = this.strokeWidth
       ..strokeCap = StrokeCap.round;
     final sweepAngle2 = 300 * math.pi / 180 * par;
-    canvas.drawArc(rect, startAngle, sweepAngle2, false, paint2);
+    canvas.drawArc(rect, startAngle, sweepAngle2, false, paint);
   }
 
   @override
