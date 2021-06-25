@@ -1,26 +1,21 @@
-import 'dart:developer';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'theme/dynamic_theme.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'sqlite.dart';
+import 'package:async/async.dart';
 
-import 'package:flutter/material.dart';
-import 'dart:math' as math;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-import 'customParameter.dart';
+import 'coutomWidget/customParameter.dart';
+
+import 'package:humpty_tyokin/createAccount.dart';
+import 'package:humpty_tyokin/apiResults.dart';
 
 void main() => runApp(MyApp());
 
-// class MyApp extends StatefulWidget {
-//   MyApp({Key key}) : super(key: key);
-
-//   @override
-//   _MyAppState createState() => _MyAppState();
-// }
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -40,45 +35,77 @@ class Cotsumi extends StatefulWidget {
 }
 
 class _CotsumiState extends State<Cotsumi> {
+  /** HTTP通信 */
   ApiResults httpRes;
+  /** ローカルデータベースから抽出したデータ */
   List<Thokin> _thokinData = [];
-
   double swipB = 30;
   int total = 0;
   int goal = 1000;
+  /** 初期化を一回だけするためのライブラリ */
+  final AsyncMemoizer memoizer= AsyncMemoizer();
+  /** 端末にデータを保存する奴 */
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   void initState() {
     super.initState();
+    /** 初回起動時のアカウント作成 */
+    // getlogin();
+  }
+  getlogin() async {
+    final SharedPreferences prefs = await _prefs;
+    // final int login = (prefs.getInt('MyAccount') ?? 0) + 1;
+    final bool first = (prefs.getBool('first') ?? false);
+    if(!first){
+      Navigator .of(context).push(
+        MaterialPageRoute(builder: (context) {
+          // ログイン画面へ
+          return CreateAccount();}),
+      ).then((value) async{
+        // reload();
+      });
+    }
   }
 
   /** 初期化処理 */
-  @override
-  Future<void> didChangeDependencies() async {
-    super.didChangeDependencies();
-    httpRes = await fetchApiResults();
-    List<Thokin> thokin=[];
-    for(int i = 0; i < httpRes.data.length; i++){
-      thokin.add(Thokin(
-        id: httpRes.data[i]["userid"],
-        date: httpRes.data[i]["datetime"],
-        money: httpRes.data[i]["money"],
-      ));
-    }
-    await SQLite.deleteThokin();
-    print(await SQLite.getThokin());
-    await SQLite.insertThokin(thokin);
-    List<Thokin> getlist = [];
-    getlist = await SQLite.getThokin();
-    
-    setState(() {
-      _thokinData = getlist;
-      for(int i = 0; i < _thokinData.length; i++){
-        total +=_thokinData[i].money;
-      }
-    });
-    print(httpRes.data);
-    print(_thokinData);
-
+  Future<void> reload() async {
+    memoizer.runOnce(
+      () async {
+        /** サーバーからデータを取得 */
+        httpRes = await fetchApiResults(
+          "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+          new SampleRequest(userid: "abc").toJson()
+        );
+        /** データを取得できたらローカルのデータを入れ替え */
+        if(httpRes.message != "Failed"){
+          List<Thokin> thokin=[];
+          for(int i = 0; i < httpRes.data.length; i++){
+            thokin.add(Thokin(
+              id: httpRes.data[i]["userid"],
+              date: httpRes.data[i]["datetime"],
+              money: httpRes.data[i]["money"],
+            ));
+          }
+          await SQLite.deleteThokin();
+          // print(await SQLite.getThokin());
+          await SQLite.insertThokin(thokin);
+        }
+        /** データを取得 */
+        List<Thokin> getlist = [];
+        getlist = await SQLite.getThokin();
+        /** データをセット */
+        setState(() {
+          _thokinData = getlist;
+          total = 0;
+          for(int i = 0; i < _thokinData.length; i++){
+            total +=_thokinData[i].money;
+          }
+        });
+        print(httpRes.data);
+        print(_thokinData);
+      },
+    );
   }
 
   @override
@@ -100,6 +127,12 @@ class _CotsumiState extends State<Cotsumi> {
     return Scaffold(
           appBar: AppBar(
             title: Text('こつみ cotsumi'),
+            actions: [
+              IconButton(onPressed: () async{
+                reload();
+              }, 
+              icon: Icon(Icons.autorenew_sharp)),
+            ],
           ),
           /******************************************************* AppBar*/
           drawer: Drawer(
@@ -142,20 +175,50 @@ class _CotsumiState extends State<Cotsumi> {
                   height: 50,
                   color: Colors.redAccent,
                   alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: 29.124,
-                    width: 110,
-                    // alignment: Alignment.center,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.blueAccent),
-                    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Icon(Icons.monetization_on_outlined),
-                      Text(
-                        "現在高",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:[
+                      // ignore: deprecated_member_use
+                      FlatButton(
+                        height: 29.124,
+                        minWidth: 100,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(Icons.monetization_on_outlined),
+                          Text(
+                            "現在高",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ]),
+                        color: Colors.white,
+                        shape: StadiumBorder(),
+                        onPressed: () {
+                        
+                        },
                       ),
-                    ]),
+                      // ignore: deprecated_member_use
+                      FlatButton(
+                        height: 29.124,
+                        minWidth: 100,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(Icons.monetization_on_outlined),
+                          Text(
+                            "現在高",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ]),
+                        color: Colors.white,
+                        shape: StadiumBorder(),
+                        onPressed: () {
+                        
+                        },
+                      ),
+                    ]
                   ),
                 ),
+
                 Container(
                     height: deviceHeight - 50,
                     alignment: Alignment.center,
@@ -163,10 +226,10 @@ class _CotsumiState extends State<Cotsumi> {
                     child: Stack(alignment: AlignmentDirectional.center, children: [
                       /** 貯金額と目標達成率 */
                       CustomParameter(
-                        total: total, 
+                        current: total, 
                         goal: goal, 
-                        height: deviceHeight, 
-                        width: deviceWidth
+                        // height: deviceHeight, 
+                        // width: deviceWidth
                       ),
                       /** 履歴画面(下スワイプ) */
                       AnimatedPositioned(
@@ -245,10 +308,21 @@ class _CotsumiState extends State<Cotsumi> {
                                       },
                                     )
                                   ),
-                                  
                                 ])),
                           )),
-                    ])),
+                      /** ロード */
+                      FutureBuilder(
+                        future: reload(),
+                        builder: (context, snapshot) {
+                          // 非同期処理未完了 = 通信中
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator(),);
+                          }
+                          return Center();
+                        },
+                      ),
+                    ])
+                ),
               ],
             );
           }),
@@ -256,29 +330,33 @@ class _CotsumiState extends State<Cotsumi> {
   }
 }
 
-class ApiResults {
-  final String message;
-  final List<dynamic> data;
-  ApiResults({
-    this.message,
-    this.data,
-  });
-  factory ApiResults.fromJson(Map<String, dynamic> json) {
-    return ApiResults(message: json['message'], data: json['data']);
-  }
-}
+// class ApiResults {
+//   final String message;
+//   final List<dynamic> data;
+//   ApiResults({
+//     this.message,
+//     this.data,
+//   });
+//   factory ApiResults.errorMsg(String msg) {
+//     return ApiResults(message: msg, data: null);
+//   }
+//   factory ApiResults.fromJson(Map<String, dynamic> json) {
+//     return ApiResults(message: json['message'], data: json['data']);
+//   }
+// }
 
-Future<ApiResults> fetchApiResults() async {
-  var url = "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php";
-  var request = new SampleRequest(userid: "abc");
-  final response = await http.post(url, body: json.encode(request.toJson()), headers: {"Content-Type": "application/json"});
+// Future<ApiResults> fetchApiResults() async {
+//   var url = "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php";
+//   var request = new SampleRequest(userid: "abc");
+//   final response = await http.post(url, body: json.encode(request.toJson()), headers: {"Content-Type": "application/json"});
 
-  if (response.statusCode == 200) {
-    return ApiResults.fromJson(json.decode(response.body));
-  } else {
-    throw Exception('Failed');
-  }
-}
+//   if (response.statusCode == 200) {
+//     return ApiResults.fromJson(json.decode(response.body));
+//   } else {
+//     return ApiResults.errorMsg("Failed");
+//     // throw Exception('Failed');
+//   }
+// }
 
 class SampleRequest {
   final String userid;
