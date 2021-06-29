@@ -56,7 +56,7 @@ class CustomParameter extends StatelessWidget{
               Text(
                 current.toString(),
                 style: TextStyle(
-                  color: currentColor,
+                  color: this.currentColor,
                   fontSize: 60,
                   fontWeight: FontWeight.w200),
                 ),
@@ -64,8 +64,8 @@ class CustomParameter extends StatelessWidget{
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.flag),
-                  Text(goal.toString(),style: TextStyle(color: goalColor),)
+                  Icon(Icons.flag,color: this.goalColor),
+                  Text(goal.toString(),style: TextStyle(color: this.goalColor),)
                 ],
               ),
             ],

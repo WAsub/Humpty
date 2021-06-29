@@ -4,6 +4,22 @@ class MyColor{
   static List<String> themeName = ["ローズ", "スカイ"];
   static Map<int,MaterialColor> themeColor = {0: rose, 1: sky};
 
+  static const int _basicPrimaryValue = 0xffe95464;
+  static const MaterialColor basic = MaterialColor(
+    _basicPrimaryValue,
+    <int, Color>{
+      0 : Color(0xffffffff),
+      1 : Color(0xffc4d977),
+      2 : Color(0xff85b103),
+      3 : Color(0xffa46303),
+      4 : Color(0xffffffff),
+      5 : Color(0xffffffff),
+      6 : Color(0xffffffff),
+      7 : Color(0xffffffff),
+      8 : Color(0xffffffff),
+      9 : Color(0xffffffff),
+    },
+  );
   static const int _rosePrimaryValue = 0xffe95464;
   static const MaterialColor rose = MaterialColor(
     _rosePrimaryValue,

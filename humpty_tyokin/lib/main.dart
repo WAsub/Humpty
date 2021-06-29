@@ -10,9 +10,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import 'coutomWidget/customParameter.dart';
+import 'coutomWidget/swipeContainer.dart';
 
 import 'package:humpty_tyokin/createAccount.dart';
 import 'package:humpty_tyokin/apiResults.dart';
+import 'package:intl/intl.dart';
 
 void main() => runApp(MyApp());
 
@@ -82,9 +84,14 @@ class _CotsumiState extends State<Cotsumi> {
           List<Thokin> thokin=[];
           for(int i = 0; i < httpRes.data.length; i++){
             thokin.add(Thokin(
-              id: httpRes.data[i]["userid"],
               date: httpRes.data[i]["datetime"],
               money: httpRes.data[i]["money"],
+              one_yen: httpRes.data[i]['one_yen'],
+              five_yen: httpRes.data[i]['five_yen'],
+              ten_yen: httpRes.data[i]['ten_yen'],
+              fifty_yen: httpRes.data[i]['fifty_yen'],
+              hundred_yen: httpRes.data[i]['hundred_yen'],
+              five_hundred_yen: httpRes.data[i]['five_hundred_yen'],
             ));
           }
           await SQLite.deleteThokin();
@@ -102,6 +109,7 @@ class _CotsumiState extends State<Cotsumi> {
             total +=_thokinData[i].money;
           }
         });
+        await new Future.delayed(new Duration(milliseconds: 1000));
         print(httpRes.data);
         print(_thokinData);
       },
@@ -173,7 +181,7 @@ class _CotsumiState extends State<Cotsumi> {
               children: [
                 Container(
                   height: 50,
-                  color: Colors.redAccent,
+                  // color: Colors.redAccent,
                   alignment: Alignment.bottomCenter,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -185,13 +193,13 @@ class _CotsumiState extends State<Cotsumi> {
                         minWidth: 100,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.monetization_on_outlined),
+                          Icon(Icons.monetization_on_outlined, color: Colors.white),
                           Text(
                             "現在高",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                         ]),
-                        color: Colors.white,
+                        color: Theme.of(context).accentColor,
                         shape: StadiumBorder(),
                         onPressed: () {
                         
@@ -203,13 +211,13 @@ class _CotsumiState extends State<Cotsumi> {
                         minWidth: 100,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.monetization_on_outlined),
+                          Icon(Icons.monetization_on_outlined, color: Colors.white),
                           Text(
                             "現在高",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                         ]),
-                        color: Colors.white,
+                        color: Theme.of(context).accentColor,
                         shape: StadiumBorder(),
                         onPressed: () {
                         
@@ -222,81 +230,65 @@ class _CotsumiState extends State<Cotsumi> {
                 Container(
                     height: deviceHeight - 50,
                     alignment: Alignment.center,
-                    color: Colors.greenAccent,
+                    // color: Colors.greenAccent,
                     child: Stack(alignment: AlignmentDirectional.center, children: [
                       /** 貯金額と目標達成率 */
                       CustomParameter(
-                        current: total, 
-                        goal: goal, 
-                        // height: deviceHeight, 
-                        // width: deviceWidth
+                            current: total, 
+                            currentColor: Theme.of(context).accentColor,
+                            goal: goal, 
+                            goalColor: Theme.of(context).accentColor,
+                            color: Theme.of(context).accentColor,
+                            backcolor: Theme.of(context).primaryColor,
+                            strokeWidth: 26,
+                            height: deviceWidth * 0.8, 
+                            width: deviceWidth * 0.8
+                          ),
+                      Container(
+                        color: Color(0xddffffff),
+
                       ),
+                      
                       /** 履歴画面(下スワイプ) */
-                      AnimatedPositioned(
-                          duration: Duration(milliseconds: 200),
-                          bottom: -(deviceHeight / 5 * 4 - swipB),
-                          child: GestureDetector(
-                            onVerticalDragUpdate: (DragUpdateDetails details) {
-                              setState(() {
-                                if (details.delta.dy < -10) {
-                                  //上スワイプ
-                                  swipB = deviceHeight / 5 * 4 - 20;
-                                }
-                                if (details.delta.dy > 10) {
-                                  //下スワイプ
-                                  swipB = 30;
-                                }
-                              });
-                            },
-                            /** スワイプコンテナ */
-                            child: Container(
-                                width: deviceWidth,
-                                height: deviceHeight / 5 * 4 + 20,
-                                decoration: BoxDecoration(
-                                  color: Colors.brown[500],
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Column(children: [
+                      SwipeContainer(
+                        height: deviceHeight / 5 * 4,
+                        width: deviceWidth,
+                        swipB: 30,
+                        color: Theme.of(context).accentColor,
+                        child: /** 履歴 */
                                   Container(
-                                    height: 50,
-                                    alignment: Alignment.topCenter,
-                                    padding: EdgeInsets.only(top: 5),
-                                    child: Container(
-                                      height: 4,
-                                      width: 80,
-                                      decoration: BoxDecoration(
-                                        color: Colors.orangeAccent,
-                                        borderRadius: BorderRadius.circular(2),
-                                      ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.white,),
                                     ),
-                                  ),
-                                  /** 履歴 */
-                                  Container(
-                                    color: Colors.amberAccent,
                                     width: deviceWidth * 0.9,
                                     height: deviceHeight / 5 * 4 * 0.7,
                                     child: ListView.separated(
                                       itemCount: _thokinData.length,
                                       itemBuilder: (context, index) {
+                                        DateFormat outputFormat = DateFormat('MM/dd');
+                                        TextStyle style1 = TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        );
+                                        TextStyle style2 = TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold
+                                        );
                                         return Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                _thokinData[index].id.toString(),
-                                                style: TextStyle(
-                                                  backgroundColor: Colors.redAccent,
-                                                ),
+                                                _thokinData[index].money > 0 ? "収入" : "支出",
+                                                style: style1
                                               ),
                                               Text(
-                                                _thokinData[index].date.toString(),
-                                                style: TextStyle(
-                                                  backgroundColor: Colors.blueAccent,
-                                                ),
+                                                "\¥"+_thokinData[index].money.toString(),
+                                                style: style2
                                               ),
                                               Text(
-                                                _thokinData[index].money.toString(),
-                                                style: TextStyle(
-                                                  backgroundColor: Colors.greenAccent,
-                                                ),
+                                                outputFormat.format(DateTime.parse(_thokinData[index].date)).toString(),
+                                                style: style1
                                               ),
                                             ],
                                         );
@@ -308,8 +300,7 @@ class _CotsumiState extends State<Cotsumi> {
                                       },
                                     )
                                   ),
-                                ])),
-                          )),
+                      ),
                       /** ロード */
                       FutureBuilder(
                         future: reload(),
@@ -329,6 +320,7 @@ class _CotsumiState extends State<Cotsumi> {
         );
   }
 }
+
 
 // class ApiResults {
 //   final String message;

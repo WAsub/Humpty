@@ -17,7 +17,7 @@ class DynamicTheme extends StatefulWidget {
   const DynamicTheme({
     Key key,
     this.themedWidgetBuilder,
-    this.defaultThemeTypes = ThemeType.ROSE,
+    this.defaultThemeTypes = ThemeType.BASIC,
     this.loadThemeTypesOnStart = true,
   }) : super(key: key);
 
@@ -42,6 +42,7 @@ class DynamicThemeState extends State<DynamicTheme> {
   get data => _data;
 
   static Map<ThemeType, ThemeData> themeMap = {
+    ThemeType.BASIC: AppTheme.theme_basic(),
     ThemeType.ROSE: AppTheme.theme_rose(),
     ThemeType.SKY: AppTheme.theme_sky(),
   };
@@ -55,9 +56,9 @@ class DynamicThemeState extends State<DynamicTheme> {
     super.initState();
     _initVariables();
     _data = new ThemeData(
-      primaryColor: MyColor.rose[2],
-      accentColor: MyColor.rose[1],
-      selectedRowColor: MyColor.rose[4],
+      primaryColor: MyColor.basic[2],
+      accentColor: MyColor.basic[1],
+      selectedRowColor: MyColor.basic[4],
       brightness: Brightness.light,
     );
 
@@ -95,6 +96,6 @@ class DynamicThemeState extends State<DynamicTheme> {
 
   Future<ThemeType> loadThemeType() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return (ThemeType.of(prefs.getString(_themeTypeKey)) ?? ThemeType.ROSE);
+    return (ThemeType.of(prefs.getString(_themeTypeKey)) ?? ThemeType.BASIC);
   }
 }

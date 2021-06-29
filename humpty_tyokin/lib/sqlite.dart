@@ -2,22 +2,32 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class Thokin {
-  String id;
   int money;
   String date;
+  int one_yen;
+  int five_yen;
+  int ten_yen;
+  int fifty_yen;
+  int hundred_yen;
+  int five_hundred_yen;
 
-  Thokin({this.id, this.date, this.money,});
+  Thokin({this.date, this.money, this.one_yen, this.five_yen, this.ten_yen, this.fifty_yen, this.hundred_yen, this.five_hundred_yen,});
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'date': date,
       'money': money,
+      'one_yen': one_yen,
+      'five_yen': five_yen,
+      'ten_yen': ten_yen,
+      'fifty_yen': fifty_yen,
+      'hundred_yen': hundred_yen,
+      'five_hundred_yen': five_hundred_yen,
     };
   }
   @override
   String toString() {
-    return 'Thokin{id: $id, date: $date, money: $money}';
+    return 'Thokin{date: $date, money: $money, one_yen: $one_yen, five_yen: $five_yen, ten_yen: $ten_yen, fifty_yen: $fifty_yen, hundred_yen: $hundred_yen, five_hundred_yen: $five_hundred_yen}';
   }
 }
 
@@ -28,10 +38,15 @@ class SQLite{
       onCreate: (db, version) async{
         await db.execute(
           "CREATE TABLE thokin("
-              "id TEXT , "
-              "date TEXT, "
-              "money INTEGER"
-              ")",
+            "date TEXT, "
+            "money INTEGER, "
+            "one_yen INTEGER, "
+            "five_yen INTEGER, "
+            "ten_yen INTEGER, "
+            "fifty_yen INTEGER, "
+            "hundred_yen INTEGER, "
+            "five_hundred_yen INTEGER"
+          ")",
         );
         // await db.execute(
         //   "CREATE TABLE images("
@@ -48,9 +63,15 @@ class SQLite{
         //   'INSERT INTO setting VALUES(15, 10)',
         // );
         // // テスト用
-        // await db.execute(
-        //   'INSERT INTO moneys(money, date) VALUES(1000, "2021-01-01")',
-        // );
+        await db.execute(
+          'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-03 15:25:07", 400, 0, 0, 0, 2, 3, 0)',
+        );
+        await db.execute(
+          'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-03 16:20:08", -50, 0, 0, 0, -1, 0, 0)',
+        );
+        await db.execute(
+          'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-03 16:25:08", 500, 0, 0, 0, 0, 0, 1)',
+        );
         // await db.execute(
         //   'INSERT INTO moneys(money, date) VALUES(1000, "2021-01-03")',
         // );
@@ -76,9 +97,14 @@ class SQLite{
     List<Thokin> list = [];
     for(int i = 0; i < maps.length; i++){
       list.add( Thokin(
-            id: maps[i]['id'],
-            date: maps[i]['date'],
-            money: maps[i]['money'],
+        date: maps[i]['date'],
+        money: maps[i]['money'],
+        one_yen: maps[i]['one_yen'],
+        five_yen: maps[i]['five_yen'],
+        ten_yen: maps[i]['ten_yen'],
+        fifty_yen: maps[i]['fifty_yen'],
+        hundred_yen: maps[i]['hundred_yen'],
+        five_hundred_yen: maps[i]['five_hundred_yen'],
       ));
     }
     return list;
@@ -89,8 +115,8 @@ class SQLite{
     // リストを順番に登録
     for(int i = 0; i < thokin.length; i++){
       await db.rawInsert(
-        'INSERT INTO thokin(id, money, date) VALUES (?, ?, ?)',
-          [thokin[i].id, thokin[i].money, thokin[i].date]
+        'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [thokin[i].date, thokin[i].money, thokin[i].one_yen, thokin[i].five_yen, thokin[i].ten_yen, thokin[i].fifty_yen, thokin[i].hundred_yen, thokin[i].five_hundred_yen]
       );
     }
     

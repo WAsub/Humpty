@@ -1,6 +1,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 class ApiResults {
@@ -21,9 +22,16 @@ class ApiResults {
 Future<ApiResults> fetchApiResults(url, requestMap) async {
   // var url = "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php";
   // var request = new SampleRequest(userid: "abc");
-  final response = await http.post(url, body: json.encode(requestMap), headers: {"Content-Type": "application/json"});
+  var response;
+  try{
+    response = await http.post(url, body: json.encode(requestMap), headers: {"Content-Type": "application/json"});
+  }on SocketException catch(e){
+    response.statusCode = 410;
+  }
+  
 
   if (response.statusCode == 200) {
+    return ApiResults.errorMsg("Failed");//TODO APIができるまで
     return ApiResults.fromJson(json.decode(response.body));
   } else {
     return ApiResults.errorMsg("Failed");
