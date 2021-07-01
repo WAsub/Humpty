@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:humpty_sumple_gesturedetector/sample_icons.dart';
+
 void main() => runApp(MyApp());
 
 // MyAppウィジェットクラス
@@ -32,69 +34,84 @@ class _MyHomePageState extends State<MyHomePage> {
     double deviceWidth;
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text("GestureDetector"),
+      appBar: AppBar(
+        // title: Text("GestureDetector"),
+        title: Text("サンプル"),
+      ),
+      body: Container(
+        alignment: Alignment.center,
+        color: Colors.red,
+        child: Container(
+          width: 100,
+          height: 100,
+          color: Colors.blue,
         ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            deviceHeight = constraints.maxHeight;
-            deviceWidth = constraints.maxWidth;
-            debugPrint(deviceWidth.toString());
-            return Stack(
-              alignment: AlignmentDirectional.center,
-              children: <Widget>[
-                Container(
-                  color: Colors.black26,
-                  height: deviceHeight,
-                  width: deviceWidth,
-                  alignment: Alignment.center,
-                  child: Container(
-                    color: Colors.white,
-                    height: 300,
-                    width: 300,
-                    child: CustomPaint(
-                      size: Size(deviceWidth, deviceHeight),
-                      painter: CirclePainter(par: 0.4),
-                    ),
-                  ),
-                ),
+      ),
+      // body: LayoutBuilder(
+      //   builder: (context, constraints) {
+      //     deviceHeight = constraints.maxHeight;
+      //     deviceWidth = constraints.maxWidth;
+      //     debugPrint(deviceWidth.toString());
+      //     return Stack(
+      //       alignment: AlignmentDirectional.center,
+      //       children: <Widget>[
+      //         Container(
+      //           color: Colors.black26,
+      //           height: deviceHeight,
+      //           width: deviceWidth,
+      //           alignment: Alignment.center,
+      //           child: Container(
+      //             color: Colors.white,
+      //             height: 300,
+      //             width: 300,
+      //             child: CustomPaint(
+      //               size: Size(deviceWidth, deviceHeight),
+      //               painter: CirclePainter(par: 0.4),
+      //             ),
+      //           ),
+      //         ),
 
-                // Panテスト用のウィジェット
-                AnimatedPositioned(
-                  duration: Duration(milliseconds: 200),
-                  top: deviceHeight + y,
-                  child: GestureDetector(
-                    onVerticalDragUpdate: (DragUpdateDetails details) {
-                      print('onVerticalDragUpdate - ${details.toString()}');
-                      // details.globalPosition; //グローバル座標
-                      // details.localPosition; //ローカル座標
-                      // details.delta; //前回からの移動量
-                      setState(() {
-                        if (details.delta.dy < -10) {
-                          debugPrint('OK');
-                          var dy = deviceHeight / 5 * 4;
-                          y = dy - dy - dy;
-                        }
-                        if (details.delta.dy > 10) {
-                          debugPrint('++');
-                          y = -70;
-                        }
-                      });
-                    },
-                    child: Container(
-                      color: Colors.green,
-                      width: deviceWidth,
-                      height: deviceHeight / 5 * 4,
-                      child: Center(
-                        child: Text(''),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ));
+      //         // Panテスト用のウィジェット
+      //         AnimatedPositioned(
+      //           duration: Duration(milliseconds: 200),
+      //           top: deviceHeight + y,
+      //           child: GestureDetector(
+      //             onVerticalDragUpdate: (DragUpdateDetails details) {
+      //               print('onVerticalDragUpdate - ${details.toString()}');
+      //               // details.globalPosition; //グローバル座標
+      //               // details.localPosition; //ローカル座標
+      //               // details.delta; //前回からの移動量
+      //               setState(() {
+      //                 if (details.delta.dy < -10) {
+      //                   debugPrint('OK');
+      //                   var dy = deviceHeight / 5 * 4;
+      //                   y = dy - dy - dy;
+      //                 }
+      //                 if (details.delta.dy > 10) {
+      //                   debugPrint('++');
+      //                   y = -70;
+      //                 }
+      //               });
+      //             },
+      //             child: Container(
+      //               color: Colors.green,
+      //               width: deviceWidth,
+      //               height: deviceHeight / 5 * 4,
+      //               child: Center(
+      //                 child: Text(''),
+      //               ),
+      //             ),
+      //           ),
+      //         ),
+      //         Container(
+      //           color: Colors.red,
+      //           child: Icon(Sample.aaa_1),
+      //         )
+      //       ],
+      //     );
+      //   },
+      // )
+    );
   }
 }
 
