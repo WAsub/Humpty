@@ -22,6 +22,7 @@ class ApiResults {
 Future<ApiResults> fetchApiResults(url, requestMap) async {
   // var url = "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php";
   // var request = new SampleRequest(userid: "abc");
+  return ApiResults.errorMsg("Failed");//TODO APIができるまで
   var response;
   try{
     response = await http.post(url, body: json.encode(requestMap), headers: {"Content-Type": "application/json"});
@@ -31,7 +32,6 @@ Future<ApiResults> fetchApiResults(url, requestMap) async {
   
 
   if (response.statusCode == 200) {
-    return ApiResults.errorMsg("Failed");//TODO APIができるまで
     return ApiResults.fromJson(json.decode(response.body));
   } else {
     return ApiResults.errorMsg("Failed");

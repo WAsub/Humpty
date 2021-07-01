@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:humpty_tyokin/apiResults.dart';
-import 'package:humpty_tyokin/coutomWidget/customTextField.dart';
+import 'package:humpty_tyokin/costomWidget/customTextField.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class InitialGoal extends StatefulWidget {

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:humpty_tyokin/costomWidget/coinCounter.dart';
 import 'theme/dynamic_theme.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -9,12 +10,14 @@ import 'package:async/async.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-import 'coutomWidget/customParameter.dart';
-import 'coutomWidget/swipeContainer.dart';
+import 'costomWidget/customParameter.dart';
+import 'costomWidget/swipeContainer.dart';
 
 import 'package:humpty_tyokin/createAccount.dart';
 import 'package:humpty_tyokin/apiResults.dart';
 import 'package:intl/intl.dart';
+import 'costomWidget/swipeCoinCounter.dart';
+import 'kirikaeFlgs.dart';
 
 void main() => runApp(MyApp());
 
@@ -37,6 +40,8 @@ class Cotsumi extends StatefulWidget {
 }
 
 class _CotsumiState extends State<Cotsumi> {
+  double deviceHeight;
+  double deviceWidth;
   /** HTTP通信 */
   ApiResults httpRes;
   /** ローカルデータベースから抽出したデータ */
@@ -48,6 +53,11 @@ class _CotsumiState extends State<Cotsumi> {
   final AsyncMemoizer memoizer= AsyncMemoizer();
   /** 端末にデータを保存する奴 */
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  /** リロード時のぐるぐる */
+  Widget cpi;
+  /** スワイプ用 */
+  double swip = 700;
+  bool swipFlg = true;
 
   @override
   void initState() {
@@ -72,12 +82,15 @@ class _CotsumiState extends State<Cotsumi> {
 
   /** 初期化処理 */
   Future<void> reload() async {
-    memoizer.runOnce(
-      () async {
+        setState(() {
+          cpi = CircularProgressIndicator(color: Theme.of(context).selectedRowColor,);
+        });
+        await new Future.delayed(new Duration(milliseconds: 3000));
+        print(cpi);
         /** サーバーからデータを取得 */
         httpRes = await fetchApiResults(
           "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-          new SampleRequest(userid: "abc").toJson()
+          new DataRequest(userid: "abc").toJson()
         );
         /** データを取得できたらローカルのデータを入れ替え */
         if(httpRes.message != "Failed"){
@@ -109,17 +122,17 @@ class _CotsumiState extends State<Cotsumi> {
             total +=_thokinData[i].money;
           }
         });
-        await new Future.delayed(new Duration(milliseconds: 1000));
+        setState(() {
+          cpi = null;
+        });
         print(httpRes.data);
         print(_thokinData);
-      },
-    );
+        print(cpi);
   }
 
   @override
   Widget build(BuildContext context) {
-    double deviceHeight;
-    double deviceWidth;
+    
 
     List<Widget> leadingIcon = [
       Icon(Icons.radio_button_off),
@@ -131,13 +144,18 @@ class _CotsumiState extends State<Cotsumi> {
       Text("お知らせ"),
       Text("アカウント設定"),
     ];
+    memoizer.runOnce(() async {
+      reload();
+    },);
     // var onTap = [null, PastRecord(), SetLine(), SetTheme(), Config(),];
     return Scaffold(
           appBar: AppBar(
             title: Text('こつみ cotsumi'),
             actions: [
+              // Container(alignment: Alignment.center,height: 15,color: Colors.red,child: CircularProgressIndicator(color: Theme.of(context).selectedRowColor,),),
               IconButton(onPressed: () async{
                 reload();
+                print("aaa");
               }, 
               icon: Icon(Icons.autorenew_sharp)),
             ],
@@ -176,12 +194,12 @@ class _CotsumiState extends State<Cotsumi> {
           body: LayoutBuilder(builder: (context, constraints) {
             deviceHeight = constraints.maxHeight;
             deviceWidth = constraints.maxWidth;
-
+            
             return Column(
               children: [
+                /** スワイプさせられるボタン(現在の画面を示すのも兼ねている) */
                 Container(
                   height: 50,
-                  // color: Colors.redAccent,
                   alignment: Alignment.bottomCenter,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -193,16 +211,19 @@ class _CotsumiState extends State<Cotsumi> {
                         minWidth: 100,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.monetization_on_outlined, color: Colors.white),
+                          Icon(Icons.monetization_on_outlined, color: !swipFlg ? Theme.of(context).accentColor : Colors.white),
                           Text(
                             "現在高",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: !swipFlg ? Theme.of(context).accentColor : Colors.white),
                           ),
                         ]),
-                        color: Theme.of(context).accentColor,
+                        color: swipFlg ? Theme.of(context).accentColor : null,
                         shape: StadiumBorder(),
                         onPressed: () {
-                        
+                          setState(() {
+                            swip = deviceWidth; 
+                            swipFlg = true;
+                          });
                         },
                       ),
                       // ignore: deprecated_member_use
@@ -211,44 +232,90 @@ class _CotsumiState extends State<Cotsumi> {
                         minWidth: 100,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.monetization_on_outlined, color: Colors.white),
+                          Icon(Icons.monetization_on_outlined, color: swipFlg ? Theme.of(context).accentColor : Colors.white),
                           Text(
-                            "現在高",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                            "硬貨数",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: swipFlg ? Theme.of(context).accentColor : Colors.white),
                           ),
                         ]),
-                        color: Theme.of(context).accentColor,
+                        color: !swipFlg ? Theme.of(context).accentColor : null,
                         shape: StadiumBorder(),
                         onPressed: () {
-                        
+                          setState(() {
+                            swip = 0; 
+                            swipFlg = false;
+                          });
                         },
                       ),
                     ]
                   ),
                 ),
-
+                /** 切り替わる画面 */
                 Container(
                     height: deviceHeight - 50,
                     alignment: Alignment.center,
-                    // color: Colors.greenAccent,
                     child: Stack(alignment: AlignmentDirectional.center, children: [
                       /** 貯金額と目標達成率 */
                       CustomParameter(
-                            current: total, 
-                            currentColor: Theme.of(context).accentColor,
-                            goal: goal, 
-                            goalColor: Theme.of(context).accentColor,
-                            color: Theme.of(context).accentColor,
-                            backcolor: Theme.of(context).primaryColor,
-                            strokeWidth: 26,
-                            height: deviceWidth * 0.8, 
-                            width: deviceWidth * 0.8
-                          ),
-                      Container(
-                        color: Color(0xddffffff),
-
+                        current: total, 
+                        currentColor: Theme.of(context).accentColor,
+                        goal: goal, 
+                        goalColor: Theme.of(context).accentColor,
+                        color: Theme.of(context).accentColor,
+                        backcolor: Theme.of(context).primaryColor,
+                        strokeWidth: 26,
+                        height: deviceWidth * 0.8, 
+                        width: deviceWidth * 0.8
                       ),
-                      
+                      /** 硬貨の枚数 */
+                      SwipeCoinCounter(
+                        swipL: swip,
+                        thokinData: _thokinData, 
+                        color: Theme.of(context).accentColor,
+                        height: deviceHeight - 50,
+                        width: deviceWidth,
+                      ),
+                      /** スワイプによる画面の切り替え */
+                      Container(
+                        child: GestureDetector(
+                          onHorizontalDragUpdate: (DragUpdateDetails details){
+                            setState(() {
+                              if (details.delta.dx > 10) { //右スワイプ
+                                swip = deviceWidth; 
+                                swipFlg = true;}
+                              if (details.delta.dx < -10) { //左スワイプ
+                                swip = 0; 
+                                swipFlg = false;}
+                            });
+                          },
+                        ),
+                      ),
+                      /** スワイプさせられる矢印ボタン(画面によって左右変わる) */
+                      swipFlg ? 
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          icon: Icon(Icons.arrow_forward_ios), 
+                          color: Theme.of(context).primaryColor,
+                          onPressed: (){
+                            setState(() {
+                              swip = 0; 
+                              swipFlg = false;
+                            });
+                          },)
+                      ) : 
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          icon: Icon(Icons.arrow_back_ios), 
+                          color: Theme.of(context).primaryColor,
+                          onPressed: (){
+                            setState(() {
+                              swip = deviceWidth; 
+                              swipFlg = true;
+                            });
+                          },)
+                      ),
                       /** 履歴画面(下スワイプ) */
                       SwipeContainer(
                         height: deviceHeight / 5 * 4,
@@ -302,16 +369,16 @@ class _CotsumiState extends State<Cotsumi> {
                                   ),
                       ),
                       /** ロード */
-                      FutureBuilder(
-                        future: reload(),
-                        builder: (context, snapshot) {
-                          // 非同期処理未完了 = 通信中
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator(),);
-                          }
-                          return Center();
-                        },
-                      ),
+                      Container(
+                        alignment: Alignment.topCenter,
+                        padding: EdgeInsets.only(top:10),
+                        child: Container(
+                          alignment: Alignment.topCenter,
+                          width: 25,
+                          height: 25,
+                          child: cpi,
+                        )
+                      )
                     ])
                 ),
               ],
@@ -320,39 +387,9 @@ class _CotsumiState extends State<Cotsumi> {
         );
   }
 }
-
-
-// class ApiResults {
-//   final String message;
-//   final List<dynamic> data;
-//   ApiResults({
-//     this.message,
-//     this.data,
-//   });
-//   factory ApiResults.errorMsg(String msg) {
-//     return ApiResults(message: msg, data: null);
-//   }
-//   factory ApiResults.fromJson(Map<String, dynamic> json) {
-//     return ApiResults(message: json['message'], data: json['data']);
-//   }
-// }
-
-// Future<ApiResults> fetchApiResults() async {
-//   var url = "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php";
-//   var request = new SampleRequest(userid: "abc");
-//   final response = await http.post(url, body: json.encode(request.toJson()), headers: {"Content-Type": "application/json"});
-
-//   if (response.statusCode == 200) {
-//     return ApiResults.fromJson(json.decode(response.body));
-//   } else {
-//     return ApiResults.errorMsg("Failed");
-//     // throw Exception('Failed');
-//   }
-// }
-
-class SampleRequest {
+class DataRequest {
   final String userid;
-  SampleRequest({
+  DataRequest({
     this.userid,
   });
   Map<String, dynamic> toJson() => {
