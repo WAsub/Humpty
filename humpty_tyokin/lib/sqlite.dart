@@ -1,9 +1,10 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:intl/intl.dart';
 
 class Thokin {
-  int money;
   String date;
+  int money;
   int one_yen;
   int five_yen;
   int ten_yen;
@@ -30,7 +31,27 @@ class Thokin {
     return 'Thokin{date: $date, money: $money, one_yen: $one_yen, five_yen: $five_yen, ten_yen: $ten_yen, fifty_yen: $fifty_yen, hundred_yen: $hundred_yen, five_hundred_yen: $five_hundred_yen}';
   }
 }
+class Goal {
+  String date;
+  int goal;
+  String memo;
+  bool flg;
 
+  Goal({this.date, this.goal, this.memo, this.flg,});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'date': date,
+      'goal': goal,
+      'memo': memo,
+      'flg': flg,
+    };
+  }
+  @override
+  String toString() {
+    return 'Thokin{date: $date, goal: $goal, memo: $memo, flg: $flg}';
+  }
+}
 class SQLite{
   static Future<Database> get database async {
     final Future<Database> _database = openDatabase(
@@ -48,20 +69,14 @@ class SQLite{
             "five_hundred_yen INTEGER"
           ")",
         );
-        // await db.execute(
-        //   "CREATE TABLE images("
-        //       "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-        //       "fid INTEGER , "
-        //       "image TEXT)",
-        // );
-        // await db.execute(
-        //   "CREATE TABLE setting("
-        //       "deadline INTEGER , "
-        //       "paymentDate INTEGER)",
-        // );
-        // await db.execute(
-        //   'INSERT INTO setting VALUES(15, 10)',
-        // );
+        await db.execute(
+          "CREATE TABLE goals("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            "date TEXT, "
+            "goal INTEGER, "
+            "memo TEXT, "
+            "flg INTEGER)",
+        );
         // // テスト用
         await db.execute(
           'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-03 15:25:07", 400, 0, 0, 0, 2, 3, 0)',
@@ -87,7 +102,7 @@ class SQLite{
     return _database;
   }
 
-  /// 貯金リスト取得用
+  /** 貯金リスト取得用 */
   static Future<List<Thokin>> getThokin() async {
     final Database db = await database;
     // リストを取得
@@ -109,7 +124,7 @@ class SQLite{
     }
     return list;
   }
-  /// 貯金リスト登録用
+  /** 貯金リスト登録用 */
   static Future<void> insertThokin(List<Thokin> thokin) async {
     final Database db = await database;
     // リストを順番に登録
@@ -121,13 +136,76 @@ class SQLite{
     }
     
   }
-  /// 貯金リスト全削除用
+  /** 貯金リスト全削除用 */
   static Future<void> deleteThokin() async {
     final db = await database;
     await db.delete(
       'thokin',
     );
   }
+  /** 目標リスト取得 */
+  static Future<List<Goal>> getGoal() async {
+    final Database db = await database;
+    // リストを取得
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+        'SELECT * FROM goals ORDER BY date'
+    );
+    List<Goal> list = [];
+    for(int i = 0; i < maps.length; i++){
+      list.add( Goal(
+        date: maps[i]['date'],
+        goal: maps[i]['goal'],
+        memo: maps[i]['memo'],
+        flg: maps[i]['flg'] != 0 ? true : false,
+      ));
+    }
+    return list;
+  }
+  /** 今の目標取得(日付順にIDふっているのでIDの最大値の行) */
+  static Future<Goal> getGoalNow() async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+        'SELECT * FROM goals WHERE id = (SELECT MAX(id) FROM goals)'
+    );
+    Goal maxGoal;
+    maxGoal = Goal(
+      date: maps[0]['date'],
+      goal: maps[0]['goal'],
+      memo: maps[0]['memo'],
+      flg: maps[0]['flg'] != 0 ? true : false,
+    );
+    return maxGoal;
+  }
+  /** 目標リスト登録用 */
+  static Future<void> insertGoals(List<Goal> goal) async {
+    final Database db = await database;
+    // リストを順番に登録
+    for(int i = 0; i < goal.length; i++){
+      await db.rawInsert(
+        'INSERT INTO goals(date, goal, memo, flg) VALUES (?, ?, ?, ?)',
+        [goal[i].date, goal[i].goal, goal[i].memo, goal[i].flg,]
+      );
+    }
+  }
+  /** 目標登録用 */
+  static Future<void> insertGoal(Goal goal) async {
+    DateTime now = DateTime.now();
+    DateFormat outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+    String date = outputFormat.format(now);
+    print(date);
+    final Database db = await database;
+    // リストを順番に登録
+    await db.rawInsert(
+      'INSERT INTO goals(date, goal, memo, flg) VALUES (?, ?, ?, ?)',
+      [date, goal.goal, goal.memo, false,]
+    );
+  }
+  /** 貯金リスト全削除用 */
+  static Future<void> deleteGoal() async {
+    final db = await database;
+    await db.delete(
+      'goals',
+    );
+  }
 
-  
 }

@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:humpty_tyokin/costomWidget/coinCounter.dart';
+import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
 import 'theme/dynamic_theme.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -132,8 +133,6 @@ class _CotsumiState extends State<Cotsumi> {
 
   @override
   Widget build(BuildContext context) {
-    
-
     List<Widget> leadingIcon = [
       Icon(Icons.radio_button_off),
       Icon(Icons.article_sharp),
@@ -211,7 +210,7 @@ class _CotsumiState extends State<Cotsumi> {
                         minWidth: 100,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.monetization_on_outlined, color: !swipFlg ? Theme.of(context).accentColor : Colors.white),
+                          Icon(CotsumiIcons.genzaidakaicon, color: !swipFlg ? Theme.of(context).accentColor : Colors.white),
                           Text(
                             "現在高",
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: !swipFlg ? Theme.of(context).accentColor : Colors.white),
@@ -232,7 +231,7 @@ class _CotsumiState extends State<Cotsumi> {
                         minWidth: 100,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.monetization_on_outlined, color: swipFlg ? Theme.of(context).accentColor : Colors.white),
+                          Icon(CotsumiIcons.coinsuuicon, color: swipFlg ? Theme.of(context).accentColor : Colors.white),
                           Text(
                             "硬貨数",
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: swipFlg ? Theme.of(context).accentColor : Colors.white),
