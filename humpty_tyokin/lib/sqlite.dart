@@ -164,16 +164,32 @@ class SQLite{
   /** 今の目標取得(日付順にIDふっているのでIDの最大値の行) */
   static Future<Goal> getGoalNow() async {
     final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.rawQuery(
+    List<Map<String, dynamic>> maps = [];
+    maps = await db.rawQuery(
         'SELECT * FROM goals WHERE id = (SELECT MAX(id) FROM goals)'
     );
+    print(await db.rawQuery(
+        'SELECT * FROM goals WHERE id = (SELECT MAX(id) FROM goals)'
+    ));
+    print(maps.isNotEmpty);
+    print(maps == null);
     Goal maxGoal;
-    maxGoal = Goal(
+    maxGoal = maps.isEmpty ? 
+    // データが空の場合
+    Goal(
+      date: null,
+      goal: null,
+      memo: null,
+      flg: true,
+    ) : 
+    // データがある場合
+    Goal(
       date: maps[0]['date'],
       goal: maps[0]['goal'],
       memo: maps[0]['memo'],
       flg: maps[0]['flg'] != 0 ? true : false,
     );
+    print(maxGoal);
     return maxGoal;
   }
   /** 目標リスト登録用 */
