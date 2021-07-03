@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'dart:math' as math;
 
+import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
+
 class CustomParameter extends StatelessWidget{
   double strokeWidth;
   int current;
@@ -34,7 +36,12 @@ class CustomParameter extends StatelessWidget{
     currentColor = currentColor == null ? Colors.black : currentColor;
     goalColor = goalColor == null ? Colors.black : goalColor;
 
-    final double parsent = current / goal;
+    double parsent = current / goal;
+    // 未設定の場合0で割ることができないので
+    if(goal == 0){ 
+      parsent = 1;
+    }
+    
 
     return Stack(
         alignment: AlignmentDirectional.center,
@@ -64,13 +71,17 @@ class CustomParameter extends StatelessWidget{
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.flag,color: this.goalColor),
-                  Text(goal.toString(),style: TextStyle(color: this.goalColor),)
+                  Icon(CotsumiIcons.group,color: this.goalColor),
+                  Text(goal == 0 ? "未設定" : goal.toString(),style: TextStyle(color: this.goalColor),)
                 ],
               ),
             ],
           ),
-
+          Container(
+            height: this.height * 1.15,
+            alignment: Alignment.topCenter,
+            child: Icon(CotsumiIcons.dollicon,size: 55, color: this.color,),
+          )
         ]
     );
   }

@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:humpty_tyokin/costomWidget/coinCounter.dart';
+import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
 import 'theme/dynamic_theme.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -48,7 +49,7 @@ class _CotsumiState extends State<Cotsumi> {
   List<Thokin> _thokinData = [];
   double swipB = 30;
   int total = 0;
-  int goal = 1000;
+  int goal = 0;
   /** 初期化を一回だけするためのライブラリ */
   final AsyncMemoizer memoizer= AsyncMemoizer();
   /** 端末にデータを保存する奴 */
@@ -112,8 +113,8 @@ class _CotsumiState extends State<Cotsumi> {
           await SQLite.insertThokin(thokin);
         }
         /** データを取得 */
-        List<Thokin> getlist = [];
-        getlist = await SQLite.getThokin();
+        List<Thokin> getlist = await SQLite.getThokin();
+        Goal nowgoal = await SQLite.getGoalNow();
         /** データをセット */
         setState(() {
           _thokinData = getlist;
@@ -121,28 +122,30 @@ class _CotsumiState extends State<Cotsumi> {
           for(int i = 0; i < _thokinData.length; i++){
             total +=_thokinData[i].money;
           }
+          goal = !nowgoal.flg ? nowgoal.goal : 0;
         });
+        print(goal);
         setState(() {
           cpi = null;
         });
-        print(httpRes.data);
-        print(_thokinData);
-        print(cpi);
+        // print(httpRes.data);
+        // print(_thokinData);
+        // print(cpi);
   }
 
   @override
   Widget build(BuildContext context) {
-    
-
     List<Widget> leadingIcon = [
       Icon(Icons.radio_button_off),
-      Icon(Icons.article_sharp),
-      Icon(Icons.settings),
+      Icon(CotsumiIcons.osiraseicon),
+      Icon(CotsumiIcons.group),
+      Icon(CotsumiIcons.group),
     ];
     List<Widget> titleText = [
       Text("user"),
       Text("お知らせ"),
       Text("アカウント設定"),
+      Text("達成履歴"),
     ];
     memoizer.runOnce(() async {
       reload();
@@ -211,7 +214,7 @@ class _CotsumiState extends State<Cotsumi> {
                         minWidth: 100,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.monetization_on_outlined, color: !swipFlg ? Theme.of(context).accentColor : Colors.white),
+                          Icon(CotsumiIcons.genzaidakaicon, color: !swipFlg ? Theme.of(context).accentColor : Colors.white),
                           Text(
                             "現在高",
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: !swipFlg ? Theme.of(context).accentColor : Colors.white),
@@ -232,7 +235,7 @@ class _CotsumiState extends State<Cotsumi> {
                         minWidth: 100,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(Icons.monetization_on_outlined, color: swipFlg ? Theme.of(context).accentColor : Colors.white),
+                          Icon(CotsumiIcons.coinsuuicon, color: swipFlg ? Theme.of(context).accentColor : Colors.white),
                           Text(
                             "硬貨数",
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: swipFlg ? Theme.of(context).accentColor : Colors.white),
@@ -260,7 +263,7 @@ class _CotsumiState extends State<Cotsumi> {
                         current: total, 
                         currentColor: Theme.of(context).accentColor,
                         goal: goal, 
-                        goalColor: Theme.of(context).accentColor,
+                        goalColor: Theme.of(context).primaryColor,
                         color: Theme.of(context).accentColor,
                         backcolor: Theme.of(context).primaryColor,
                         strokeWidth: 26,
