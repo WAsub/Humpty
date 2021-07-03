@@ -35,6 +35,8 @@ dependencies:
   shared_preferences:
   # 2021/6/18
   async: 
+  # 2021/6/29
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
@@ -81,3 +83,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+  fonts:
+  - family:  CotsumiIcons
+    fonts:
+    - asset: fonts/CotsumiIcons.ttf

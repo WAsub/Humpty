@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:humpty_tyokin/InitialGoal.dart';
 import 'package:humpty_tyokin/apiResults.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:humpty_tyokin/coutomWidget/customTextField.dart';
+import 'package:humpty_tyokin/costomWidget/customTextField.dart';
 
 class InitialSetting extends StatefulWidget {
   @override
