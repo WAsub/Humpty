@@ -88,3 +88,8 @@ flutter:
   - family:  CotsumiIcons
     fonts:
     - asset: fonts/CotsumiIcons.ttf
+  - family: RobotoMono
+    fonts:
+    - asset: fonts/RobotoMono-Light.ttf
+    - asset: fonts/RobotoMono-LightItalic.ttf
+    - asset: fonts/RobotoMono-ThinItalic.ttf
