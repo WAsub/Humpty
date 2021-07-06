@@ -63,11 +63,24 @@ class _CotsumiState extends State<Cotsumi> {
   double swip = 700;
   bool swipFlg = true;
 
+  // DateTime weeklyNowShow = DateTime.now();
+  DateTime weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); //TODO テスト用
+  DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
+  DateFormat formatMD = DateFormat('M/d');
   @override
   void initState() {
     super.initState();
     /** 初回起動時のアカウント作成 */
     // getlogin();
+  }
+
+  List<DateTime> getWeekStartEnd(DateTime datetime){
+    int weekday = datetime.weekday;
+    DateTime sDate = datetime.add(Duration(days: -(weekday - 1)));
+    DateTime eDate = datetime.add(Duration(days: 7 - weekday));
+    sDate = DateTime(sDate.year, sDate.month, sDate.day, 0, 0, 0);
+    eDate = DateTime(eDate.year, eDate.month, eDate.day, 23, 59, 59, 999);
+    return [sDate,eDate];
   }
 
   getlogin() async {
@@ -118,7 +131,11 @@ class _CotsumiState extends State<Cotsumi> {
     }
     /** データを取得 */
     List<Thokin> getlist = await SQLite.getThokin();
-    List<Thokin> getweeklist = await SQLite.getWeeklyThokin(DateTime.parse("2021-01-03 15:25:07")); // TODO てすと用
+    setState(() {
+      // weeklyNowShow = DateTime.now();
+      weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); // TODO テスト用
+    });
+    List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
     Goal nowgoal = await SQLite.getGoalNow();
     /** データをセット */
     setState(() {
@@ -299,13 +316,31 @@ class _CotsumiState extends State<Cotsumi> {
                                   
                                 },
                               ),
-                              Text("5/1〜5/8", style: TextStyle(fontFamily: "RobotoMono", fontStyle: FontStyle.italic,color: Theme.of(context).primaryColor,),),
+                              Text(
+                                formatMD.format(getWeekStartEnd(weeklyNowShow)[0])+
+                                "〜"+ 
+                                formatMD.format(getWeekStartEnd(weeklyNowShow)[1]), 
+                                style: TextStyle(
+                                  fontFamily: "RobotoMono", 
+                                  fontStyle: FontStyle.italic, 
+                                  color: Theme.of(context).primaryColor,),
+                              ),
                               IconButton(
                                 icon: Icon(Icons.arrow_forward_ios, size: 20,),
                                 alignment: Alignment.centerRight,
                                 color: Colors.white,
-                                onPressed: () {
-                                  
+                                onPressed: () async {
+                                  print("dd");
+                                  setState(() {
+                                    weeklyNowShow = weeklyNowShow.add(Duration(days: 7));
+                                  });
+                                  print(weeklyNowShow.add(Duration(days: 7)));
+                                  // List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
+                                  // setState(() {
+                                  //   _weeklyThokinData = getweeklist;
+                                  // });
+                                  print(weeklyNowShow);
+                                  print(_weeklyThokinData);
                                 },
                               )
                             ],

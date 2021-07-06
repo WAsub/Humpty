@@ -45,11 +45,13 @@ class _InitialSettingState extends State<InitialSetting> {
         print('フォーカスした');
         setState(() {
           nonShow = 0;
+          nonMargin = 1;
         });
       } else {
         print('フォーカスが外れた');
         setState(() {
           nonShow = 1;
+          nonMargin = 1;
         });
       }
     });

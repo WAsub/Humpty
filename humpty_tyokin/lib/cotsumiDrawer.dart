@@ -4,6 +4,7 @@ import 'dart:math' as math;
 
 import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
 import 'package:humpty_tyokin/goalHistory.dart';
+import 'package:humpty_tyokin/settingAccount.dart';
 
 class CotsumiDrawer extends StatelessWidget {
   String userName;
@@ -30,7 +31,7 @@ class CotsumiDrawer extends StatelessWidget {
     var onTap = [
       null,
       null,
-      null,
+      SettingAccount(),
       GoalHistory(),
     ];
     return Drawer(

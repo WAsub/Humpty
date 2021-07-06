@@ -7,7 +7,9 @@ class AppTheme {
       primaryColor: MyColor.basic[1],
       accentColor: MyColor.basic[2],
       selectedRowColor: MyColor.basic[3],
-      brightness: Brightness.light,
+      focusColor: MyColor.basic[2],
+      brightness: Brightness.light, 
+      textSelectionTheme: TextSelectionThemeData(cursorColor: MyColor.basic[2]),
     );
   }
   static ThemeData theme_rose() {
