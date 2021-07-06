@@ -67,6 +67,15 @@ class _CotsumiState extends State<Cotsumi> {
   DateTime weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); //TODO テスト用
   DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
   DateFormat formatMD = DateFormat('M/d');
+
+  final _onTimeChange = StreamController();
+  @override
+  void dispose() {
+    // StreamControllerは必ず開放する
+    _onTimeChange.close();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -74,13 +83,13 @@ class _CotsumiState extends State<Cotsumi> {
     // getlogin();
   }
 
-  List<DateTime> getWeekStartEnd(DateTime datetime){
+  List<DateTime> getWeekStartEnd(DateTime datetime) {
     int weekday = datetime.weekday;
     DateTime sDate = datetime.add(Duration(days: -(weekday - 1)));
     DateTime eDate = datetime.add(Duration(days: 7 - weekday));
     sDate = DateTime(sDate.year, sDate.month, sDate.day, 0, 0, 0);
     eDate = DateTime(eDate.year, eDate.month, eDate.day, 23, 59, 59, 999);
-    return [sDate,eDate];
+    return [sDate, eDate];
   }
 
   getlogin() async {
@@ -136,6 +145,7 @@ class _CotsumiState extends State<Cotsumi> {
       weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); // TODO テスト用
     });
     List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
+    _onTimeChange.sink.add(getweeklist);
     Goal nowgoal = await SQLite.getGoalNow();
     /** データをセット */
     setState(() {
@@ -300,87 +310,82 @@ class _CotsumiState extends State<Cotsumi> {
                     width: deviceWidth,
                     swipB: 30,
                     color: Theme.of(context).accentColor,
-                    child: Column(
-                      children: [
-                        /** 先週や来週へ */
-                        Container(
-                          width: deviceWidth * 0.9,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.arrow_back_ios, size: 20,),
-                                alignment: Alignment.centerLeft,
-                                color: Colors.white,
-                                onPressed: () {
-                                  
-                                },
-                              ),
-                              Text(
-                                formatMD.format(getWeekStartEnd(weeklyNowShow)[0])+
-                                "〜"+ 
-                                formatMD.format(getWeekStartEnd(weeklyNowShow)[1]), 
-                                style: TextStyle(
-                                  fontFamily: "RobotoMono", 
-                                  fontStyle: FontStyle.italic, 
-                                  color: Theme.of(context).primaryColor,),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.arrow_forward_ios, size: 20,),
-                                alignment: Alignment.centerRight,
-                                color: Colors.white,
-                                onPressed: () async {
-                                  print("dd");
-                                  setState(() {
-                                    weeklyNowShow = weeklyNowShow.add(Duration(days: 7));
-                                  });
-                                  print(weeklyNowShow.add(Duration(days: 7)));
-                                  // List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
-                                  // setState(() {
-                                  //   _weeklyThokinData = getweeklist;
-                                  // });
-                                  print(weeklyNowShow);
-                                  print(_weeklyThokinData);
-                                },
-                              )
-                            ],
-                          ),
-                        ),
-                        /** 週間履歴 */
-                        Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.white,
-                              ),
-                            ),
-                            width: deviceWidth * 0.9,
-                            height: deviceHeight / 5 * 4 * 0.7,
-                            child: ListView.separated(
-                              itemCount: _weeklyThokinData.length,
-                              itemBuilder: (context, index) {
-                                DateFormat format = DateFormat('M/d');
-                                TextStyle style1 = TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                );
-                                TextStyle style2 = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold);
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(_weeklyThokinData[index].money > 0 ? "収入" : "支出", style: style1),
-                                    Text("\¥" + _weeklyThokinData[index].money.toString(), style: style2),
-                                    Text(format.format(_weeklyThokinData[index].date).toString(), style: style1),
-                                  ],
-                                );
-                              },
-                              separatorBuilder: (context, index) {
-                                return Divider(
-                                  height: 5,
-                                );
-                              },
-                            )),
-                      ],
-                    )
+                    child: StreamBuilder(
+                        // 指定したstreamにデータが流れてくると再描画される
+                        stream: _onTimeChange.stream,
+                        builder: (BuildContext context, AsyncSnapshot snapShot) {
+                          List<Thokin> list = snapShot.data;
+
+                          return Column(
+                              children: [
+                                /** 先週や来週へ */
+                                Container(
+                                  width: deviceWidth * 0.9,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.arrow_back_ios, size: 20,),
+                                        alignment: Alignment.centerLeft,
+                                        color: Colors.white,
+                                        onPressed: () async {
+                                          weeklyNowShow = weeklyNowShow.add(Duration(days: -7));
+                                          List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
+                                          _onTimeChange.sink.add(getweeklist);
+                                        },
+                                      ),
+                                      Text(
+                                        formatMD.format(getWeekStartEnd(weeklyNowShow)[0]) + "〜" + formatMD.format(getWeekStartEnd(weeklyNowShow)[1]),
+                                        style: TextStyle(
+                                          fontFamily: "RobotoMono",
+                                          fontStyle: FontStyle.italic,
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.arrow_forward_ios, size: 20,),
+                                        alignment: Alignment.centerRight,
+                                        color: Colors.white,
+                                        onPressed: () async {
+                                          weeklyNowShow = weeklyNowShow.add(Duration(days: 7));
+                                          List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
+                                          _onTimeChange.sink.add(getweeklist);
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                /** 週間履歴 */
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.white,),
+                                  ),
+                                  width: deviceWidth * 0.9,
+                                  height: deviceHeight / 5 * 4 * 0.7,
+                                  child: ListView.separated(
+                                    itemCount: list.length,
+                                    itemBuilder: (context, index) {
+                                      TextStyle style1 = TextStyle(color: Colors.white, fontSize: 16,);
+                                      TextStyle style2 = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold);
+                                      
+                                      return Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(list[index].money > 0 ? "収入" : "支出", style: style1),
+                                          Text("\¥" + list[index].money.toString(), style: style2),
+                                          Text(formatMD.format(list[index].date).toString(), style: style1),
+                                        ],
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) {
+                                      return Divider(height: 5,);
+                                    },
+                                  )
+                                ),
+                              ],
+                          );
+                        }
+                    ),
                   ),
                   /** ロード */
                   Container(

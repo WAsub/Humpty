@@ -105,6 +105,12 @@ class SQLite {
         await db.execute(
           'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-03 16:25:08", 500, 0, 0, 0, 0, 0, 1)',
         );
+        await db.execute(
+          'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-05 16:25:08", -10, 0, 0, -1, 0, 0, 0)',
+        );
+        await db.execute(
+          'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-12 16:25:08", 200, 0, 0, 0, 0, 2, 0)',
+        );
         // await db.execute(
         //   'INSERT INTO moneys(money, date) VALUES(1000, "2021-01-03")',
         // );
