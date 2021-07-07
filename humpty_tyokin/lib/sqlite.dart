@@ -126,6 +126,16 @@ class SQLite {
     return _database;
   }
 
+  /** データ加工用 */
+  static List<DateTime> getWeekStartEnd(DateTime datetime) {
+    int weekday = datetime.weekday;
+    DateTime sDate = datetime.add(Duration(days: -(weekday - 1)));
+    DateTime eDate = datetime.add(Duration(days: 7 - weekday));
+    sDate = DateTime(sDate.year, sDate.month, sDate.day, 0, 0, 0);
+    eDate = DateTime(eDate.year, eDate.month, eDate.day, 23, 59, 59, 999);
+    return [sDate, eDate];
+  }
+
   /** 貯金リスト取得用 */
   static Future<List<Thokin>> getThokin() async {
     final Database db = await database;

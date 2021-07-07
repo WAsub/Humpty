@@ -1,28 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/costomWidget/coinCounter.dart';
-import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
-import 'package:humpty_tyokin/cotsumiDrawer.dart';
-import 'package:humpty_tyokin/goalHistory.dart';
-import 'theme/dynamic_theme.dart';
 import 'dart:async';
-import 'dart:convert';
 import 'sqlite.dart';
 import 'package:async/async.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-import 'costomWidget/customParameter.dart';
-import 'costomWidget/swipeContainer.dart';
-
+import 'package:humpty_tyokin/theme/dynamic_theme.dart';
+import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
+import 'package:humpty_tyokin/costomWidget/customParameter.dart';
+import 'package:humpty_tyokin/costomWidget/swipeCoinCounter.dart';
+import 'package:humpty_tyokin/cotsumiDrawer.dart';
+import 'package:humpty_tyokin/weeklyThokin.dart';
 import 'package:humpty_tyokin/createAccount.dart';
 import 'package:humpty_tyokin/apiResults.dart';
-import 'package:intl/intl.dart';
-import 'costomWidget/swipeCoinCounter.dart';
-import 'kirikaeFlgs.dart';
-
 void main() => runApp(MyApp());
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -49,8 +40,6 @@ class _CotsumiState extends State<Cotsumi> {
   ApiResults httpRes;
   /** ローカルデータベースから抽出したデータ */
   List<Thokin> _thokinData = [];
-  List<Thokin> _weeklyThokinData = [];
-  double swipB = 30;
   int total = 0;
   int goal = 0;
   /** 初期化を一回だけするためのライブラリ */
@@ -59,20 +48,21 @@ class _CotsumiState extends State<Cotsumi> {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   /** リロード時のぐるぐる */
   Widget cpi;
-  /** スワイプ用 */
+  /** コイン枚数のスワイプ用 */
   double swip = 700;
   bool swipFlg = true;
-
+  /** 週間貯金データ用 */
   // DateTime weeklyNowShow = DateTime.now();
   DateTime weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); //TODO テスト用
   DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
   DateFormat formatMD = DateFormat('M/d');
+  /** 週間貯金データコンテナ部分生成用 */
+  final _streamController = StreamController();
 
-  final _onTimeChange = StreamController();
   @override
   void dispose() {
     // StreamControllerは必ず開放する
-    _onTimeChange.close();
+    _streamController.close();
     super.dispose();
   }
 
@@ -83,15 +73,7 @@ class _CotsumiState extends State<Cotsumi> {
     // getlogin();
   }
 
-  List<DateTime> getWeekStartEnd(DateTime datetime) {
-    int weekday = datetime.weekday;
-    DateTime sDate = datetime.add(Duration(days: -(weekday - 1)));
-    DateTime eDate = datetime.add(Duration(days: 7 - weekday));
-    sDate = DateTime(sDate.year, sDate.month, sDate.day, 0, 0, 0);
-    eDate = DateTime(eDate.year, eDate.month, eDate.day, 23, 59, 59, 999);
-    return [sDate, eDate];
-  }
-
+  /** チュートリアルを出すか判定 */
   getlogin() async {
     final SharedPreferences prefs = await _prefs;
     // final int login = (prefs.getInt('MyAccount') ?? 0) + 1;
@@ -99,26 +81,24 @@ class _CotsumiState extends State<Cotsumi> {
     if (!first) {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) {
-          // ログイン画面へ
+          // チュートリアル画面へ
           return CreateAccount();
         }),
-      ).then((value) async {
-        // reload();
-      });
+      );
     }
   }
 
-  /** 初期化処理 */
-  Future<void> reload() async {
-    setState(() {
-      cpi = CircularProgressIndicator(
-        color: Theme.of(context).selectedRowColor,
-      );
-    });
+  /** ローディング処理 */
+  Future<void> loading() async {
+    /** 更新終わるまでグルグルを出しとく */
+    setState(() => cpi = CircularProgressIndicator());
     await new Future.delayed(new Duration(milliseconds: 3000));
-    // print(cpi);
     /** サーバーからデータを取得 */
-    httpRes = await fetchApiResults("http://haveabook.php.xdomain.jp/editing/api/sumple_api.php", new DataRequest(userid: "abc").toJson());
+    httpRes = await fetchApiResults(
+      "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+      // new DataRequest(userid: "abc").toJson()
+      new DataRequest(userid: "abc").toJson() // TODO　テスト用
+    );
     /** データを取得できたらローカルのデータを入れ替え */
     if (httpRes.message != "Failed") {
       List<Thokin> thokin = [];
@@ -135,17 +115,12 @@ class _CotsumiState extends State<Cotsumi> {
         ));
       }
       await SQLite.deleteThokin();
-      // print(await SQLite.getThokin());
       await SQLite.insertThokin(thokin);
     }
     /** データを取得 */
+    // 貯金データ全部
     List<Thokin> getlist = await SQLite.getThokin();
-    setState(() {
-      // weeklyNowShow = DateTime.now();
-      weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); // TODO テスト用
-    });
-    List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
-    _onTimeChange.sink.add(getweeklist);
+    // 今の目標
     Goal nowgoal = await SQLite.getGoalNow();
     /** データをセット */
     setState(() {
@@ -154,13 +129,15 @@ class _CotsumiState extends State<Cotsumi> {
       for (int i = 0; i < _thokinData.length; i++) {
         total += _thokinData[i].money;
       }
-      _weeklyThokinData = getweeklist;
       goal = !nowgoal.flg ? nowgoal.goal : 0;
     });
-    // print(goal);
-    setState(() {
-      cpi = null;
-    });
+    // 週間貯金データ(下のスワイプコンテナ用)
+    // setState(() => weeklyNowShow = DateTime.now());
+    setState(() => weeklyNowShow = DateTime.parse("2021-01-03 15:25:07")); // TODO テスト用
+    List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
+    _streamController.sink.add(getweeklist); // StreamBuilderに流して部分生成
+    /** グルグル終わり */ 
+    setState(() => cpi = null);
     // print(httpRes.data);
     // print(_thokinData);
     // print(cpi);
@@ -168,22 +145,17 @@ class _CotsumiState extends State<Cotsumi> {
 
   @override
   Widget build(BuildContext context) {
-    memoizer.runOnce(
-      () async {
-        reload();
-      },
-    );
+    /** 一度だけロードする */
+    memoizer.runOnce(() async => loading());
+    /** 画面 */
     return Scaffold(
       appBar: AppBar(
         title: Text('こつみ cotsumi'),
         actions: [
-          // Container(alignment: Alignment.center,height: 15,color: Colors.red,child: CircularProgressIndicator(color: Theme.of(context).selectedRowColor,),),
           IconButton(
-              onPressed: () async {
-                reload();
-                // print("aaa");
-              },
-              icon: Icon(Icons.autorenew_sharp)),
+            icon: Icon(Icons.autorenew_sharp),
+            onPressed: () async => loading(),
+          )
         ],
       ),
       /******************************************************* AppBar*/
@@ -193,8 +165,7 @@ class _CotsumiState extends State<Cotsumi> {
         deviceHeight = constraints.maxHeight;
         deviceWidth = constraints.maxWidth;
 
-        return Column(
-          children: [
+        return Column( children: [
             /** スワイプさせられるボタン(現在の画面を示すのも兼ねている) */
             Container(
               height: 50,
@@ -250,7 +221,17 @@ class _CotsumiState extends State<Cotsumi> {
                 alignment: Alignment.center,
                 child: Stack(alignment: AlignmentDirectional.center, children: [
                   /** 貯金額と目標達成率 */
-                  CustomParameter(current: total, currentColor: Theme.of(context).accentColor, goal: goal, goalColor: Theme.of(context).primaryColor, color: Theme.of(context).accentColor, backcolor: Theme.of(context).primaryColor, strokeWidth: 26, height: deviceWidth * 0.8, width: deviceWidth * 0.8),
+                  CustomParameter(
+                    current: total, 
+                    currentColor: Theme.of(context).accentColor, 
+                    goal: goal, 
+                    goalColor: Theme.of(context).primaryColor, 
+                    color: Theme.of(context).accentColor, 
+                    backcolor: Theme.of(context).primaryColor, 
+                    strokeWidth: 26, 
+                    height: deviceWidth * 0.8, 
+                    width: deviceWidth * 0.8
+                  ),
                   /** 硬貨の枚数 */
                   SwipeCoinCounter(
                     swipL: swip,
@@ -280,137 +261,64 @@ class _CotsumiState extends State<Cotsumi> {
                   ),
                   /** スワイプさせられる矢印ボタン(画面によって左右変わる) */
                   swipFlg
-                      ? Container(
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            icon: Icon(Icons.arrow_forward_ios),
-                            color: Theme.of(context).primaryColor,
-                            onPressed: () {
-                              setState(() {
-                                swip = 0;
-                                swipFlg = false;
-                              });
-                            },
-                          ))
-                      : Container(
-                          alignment: Alignment.centerLeft,
-                          child: IconButton(
-                            icon: Icon(Icons.arrow_back_ios),
-                            color: Theme.of(context).primaryColor,
-                            onPressed: () {
-                              setState(() {
-                                swip = deviceWidth;
-                                swipFlg = true;
-                              });
-                            },
-                          )),
+                  ? Container(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_forward_ios),
+                        color: Theme.of(context).primaryColor,
+                        onPressed: () {
+                          setState(() {
+                            swip = 0;
+                            swipFlg = false;
+                          });
+                        },
+                      )
+                    )
+                  : Container(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back_ios),
+                        color: Theme.of(context).primaryColor,
+                        onPressed: () {
+                          setState(() {
+                            swip = deviceWidth;
+                            swipFlg = true;
+                          });
+                        },
+                      )
+                    ),
                   /** 履歴画面(下スワイプ) */
-                  SwipeContainer(
+                  // weeklyThokin.dart
+                  WeeklyThokin(
                     height: deviceHeight / 5 * 4,
                     width: deviceWidth,
-                    swipB: 30,
-                    color: Theme.of(context).accentColor,
-                    child: StreamBuilder(
-                        // 指定したstreamにデータが流れてくると再描画される
-                        stream: _onTimeChange.stream,
-                        builder: (BuildContext context, AsyncSnapshot snapShot) {
-                          List<Thokin> list = snapShot.data;
-
-                          return Column(
-                              children: [
-                                /** 先週や来週へ */
-                                Container(
-                                  width: deviceWidth * 0.9,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      IconButton(
-                                        icon: Icon(Icons.arrow_back_ios, size: 20,),
-                                        alignment: Alignment.centerLeft,
-                                        color: Colors.white,
-                                        onPressed: () async {
-                                          weeklyNowShow = weeklyNowShow.add(Duration(days: -7));
-                                          List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
-                                          _onTimeChange.sink.add(getweeklist);
-                                        },
-                                      ),
-                                      Text(
-                                        formatMD.format(getWeekStartEnd(weeklyNowShow)[0]) + "〜" + formatMD.format(getWeekStartEnd(weeklyNowShow)[1]),
-                                        style: TextStyle(
-                                          fontFamily: "RobotoMono",
-                                          fontStyle: FontStyle.italic,
-                                          color: Theme.of(context).primaryColor,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        icon: Icon(Icons.arrow_forward_ios, size: 20,),
-                                        alignment: Alignment.centerRight,
-                                        color: Colors.white,
-                                        onPressed: () async {
-                                          weeklyNowShow = weeklyNowShow.add(Duration(days: 7));
-                                          List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
-                                          _onTimeChange.sink.add(getweeklist);
-                                        },
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                /** 週間履歴 */
-                                Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white,),
-                                  ),
-                                  width: deviceWidth * 0.9,
-                                  height: deviceHeight / 5 * 4 * 0.7,
-                                  child: ListView.separated(
-                                    itemCount: list.length,
-                                    itemBuilder: (context, index) {
-                                      TextStyle style1 = TextStyle(color: Colors.white, fontSize: 16,);
-                                      TextStyle style2 = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold);
-                                      
-                                      return Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(list[index].money > 0 ? "収入" : "支出", style: style1),
-                                          Text("\¥" + list[index].money.toString(), style: style2),
-                                          Text(formatMD.format(list[index].date).toString(), style: style1),
-                                        ],
-                                      );
-                                    },
-                                    separatorBuilder: (context, index) {
-                                      return Divider(height: 5,);
-                                    },
-                                  )
-                                ),
-                              ],
-                          );
-                        }
-                    ),
+                    streamC: _streamController,
+                    weeklyNow: weeklyNowShow,
                   ),
                   /** ロード */
                   Container(
+                    alignment: Alignment.topCenter,
+                    padding: EdgeInsets.only(top: 10),
+                    child: Container(
                       alignment: Alignment.topCenter,
-                      padding: EdgeInsets.only(top: 10),
-                      child: Container(
-                        alignment: Alignment.topCenter,
-                        width: 25,
-                        height: 25,
-                        child: cpi,
-                      ))
-                ])),
+                      width: 25,
+                      height: 25,
+                      child: cpi,
+                    )
+                  )
+                ]
+              )
+            ),
           ],
         );
       }),
     );
   }
 }
-
 class DataRequest {
   final String userid;
-  DataRequest({
-    this.userid,
-  });
+  DataRequest({this.userid,});
   Map<String, dynamic> toJson() => {
-        'userid': userid,
-      };
+    'userid': userid,
+  };
 }

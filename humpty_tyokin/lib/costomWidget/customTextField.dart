@@ -30,25 +30,15 @@ class CustomTextField extends StatefulWidget{
   });
   @override
   CustomTextFieldState createState() => CustomTextFieldState();
-
-  
-
 }
 
 
 class CustomTextFieldState extends State<CustomTextField> {
-
   @override
   Widget build(BuildContext context) {
-    if(widget.margin == null){
-      widget.margin = EdgeInsets.only(top: 20);
-    }
-    if(widget.backgroundColor == null){
-      widget.backgroundColor = Colors.white;
-    }
-    if(widget.obscureText == null){
-      widget.obscureText = false;
-    }
+    widget.margin = widget.margin == null ? EdgeInsets.only(top: 20) : widget.margin;
+    widget.backgroundColor = widget.backgroundColor == null ? Colors.white : widget.backgroundColor;
+    widget.obscureText = widget.obscureText == null ? false : widget.obscureText;
 
     return Container(
       alignment: Alignment.center,
@@ -62,11 +52,16 @@ class CustomTextFieldState extends State<CustomTextField> {
         focusNode: widget.focusNode,
         controller: widget.controller,
         decoration: new InputDecoration(
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              width: 1.5,
+                color: Theme.of(context).primaryColor,
+            ),),
           focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            width: 1.5,
-              color: Theme.of(context).accentColor,
-          ),),
+            borderSide: BorderSide(
+              width: 1.5,
+                color: Theme.of(context).accentColor,
+            ),),
           hintText: widget.hintText,
           hintStyle: TextStyle(fontSize: widget.hintFontSize,),
           border: OutlineInputBorder(

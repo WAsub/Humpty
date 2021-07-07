@@ -1,9 +1,8 @@
-import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/costomWidget/cotsumiGoalCard.dart';
-import 'package:humpty_tyokin/cotsumiDrawer.dart';
-import 'package:humpty_tyokin/sqlite.dart';
+import 'package:async/async.dart';
 
+import 'package:humpty_tyokin/costomWidget/cotsumiGoalCard.dart';
+import 'package:humpty_tyokin/sqlite.dart';
 class GoalHistory extends StatefulWidget {
   const GoalHistory({Key key}) : super(key: key);
 
@@ -21,47 +20,32 @@ class _GoalHistoryState extends State<GoalHistory> {
   /** 初期化を一回だけするためのライブラリ */
   final AsyncMemoizer memoizer = AsyncMemoizer();
 
-  Future<void> reload() async {
-    setState(() {
-      cpi = CircularProgressIndicator(
-        color: Theme.of(context).selectedRowColor,
-      );
-    });
+  Future<void> loading() async {
+    /** 更新終わるまでグルグルを出しとく */
+    setState(() => cpi = CircularProgressIndicator());
     await new Future.delayed(new Duration(milliseconds: 3000));
-    // print(cpi);
-    
     /** データを取得 */
     List<Goal> getlist = await SQLite.getGoal();
     /** データをセット */
-    setState(() {
-      _goaldata = getlist;
-    });
-    // print(goal);
-    setState(() {
-      cpi = null;
-    });
-    // print(httpRes.data);
-    // print(_thokinData);
-    // print(cpi);
+    setState(() => _goaldata = getlist);
+    /** グルグル終わり */ 
+    setState(() => cpi = null);
   }
 
   @override
   Widget build(BuildContext context) {
-    memoizer.runOnce(
-      () async {
-        reload();
-      },
-    );
+    /** 一度だけロードする */
+    memoizer.runOnce(() async => loading());
+    /** 画面 */
     return Scaffold(
       appBar: AppBar(
         title: Text('こつみ cotsumi'),
-        leading: IconButton(icon: Icon(Icons.arrow_back),onPressed: (){
-          Navigator.pop(context,);
-        },),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context,),
+        ),
       ),
       /******************************************************* AppBar*/
-      // drawer: CotsumiDrawer(),
-      /******************************************************* Drawer*/
       body: LayoutBuilder(builder: (context, constraints) {
         deviceHeight = constraints.maxHeight;
         deviceWidth = constraints.maxWidth;
