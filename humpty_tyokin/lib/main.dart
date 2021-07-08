@@ -11,7 +11,7 @@ import 'package:humpty_tyokin/costomWidget/customParameter.dart';
 import 'package:humpty_tyokin/costomWidget/swipeCoinCounter.dart';
 import 'package:humpty_tyokin/cotsumiDrawer.dart';
 import 'package:humpty_tyokin/weeklyThokin.dart';
-import 'package:humpty_tyokin/createAccount.dart';
+import 'package:humpty_tyokin/signUp/createAccount.dart';
 import 'package:humpty_tyokin/apiResults.dart';
 void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
@@ -58,6 +58,8 @@ class _CotsumiState extends State<Cotsumi> {
   DateFormat formatMD = DateFormat('M/d');
   /** 週間貯金データコンテナ部分生成用 */
   final _streamController = StreamController();
+  /** ログインデータ */
+  List<String> _loginData = ["", ""];
 
   @override
   void dispose() {
@@ -70,21 +72,41 @@ class _CotsumiState extends State<Cotsumi> {
   void initState() {
     super.initState();
     /** 初回起動時のアカウント作成 */
-    // getlogin();
+    isFirst();
+    isLogin();
   }
 
   /** チュートリアルを出すか判定 */
-  getlogin() async {
+  isFirst() async {
     final SharedPreferences prefs = await _prefs;
     // final int login = (prefs.getInt('MyAccount') ?? 0) + 1;
     final bool first = (prefs.getBool('first') ?? false);
     if (!first) {
-      Navigator.of(context).push(
+      Navigator .of(context).push(
         MaterialPageRoute(builder: (context) {
           // チュートリアル画面へ
           return CreateAccount();
         }),
-      );
+      ).then((value) async{
+        /** リロード */
+        loading();
+      });
+    }
+  }
+  /** ログイン */
+  isLogin() async {
+    final SharedPreferences prefs = await _prefs;
+    final String myAct = (prefs.getString('myname') ?? "");
+    final String mypass = (prefs.getString('mypass') ?? "");
+    if(myAct != "" && mypass != ""){
+      setState(() => _loginData = [myAct, mypass]);
+    }else{
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(builder: (context) {
+      //     // ログイン画面へ
+      //     // return CreateAccount();
+      //   }),
+      // );
     }
   }
 
@@ -96,7 +118,7 @@ class _CotsumiState extends State<Cotsumi> {
     /** サーバーからデータを取得 */
     httpRes = await fetchApiResults(
       "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-      // new DataRequest(userid: "abc").toJson()
+      /// new DataRequest(userid: _loginData[0]).toJson()
       new DataRequest(userid: "abc").toJson() // TODO　テスト用
     );
     /** データを取得できたらローカルのデータを入れ替え */
@@ -132,7 +154,7 @@ class _CotsumiState extends State<Cotsumi> {
       goal = !nowgoal.flg ? nowgoal.goal : 0;
     });
     // 週間貯金データ(下のスワイプコンテナ用)
-    // setState(() => weeklyNowShow = DateTime.now());
+    /// setState(() => weeklyNowShow = DateTime.now());
     setState(() => weeklyNowShow = DateTime.parse("2021-01-03 15:25:07")); // TODO テスト用
     List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
     _streamController.sink.add(getweeklist); // StreamBuilderに流して部分生成
@@ -159,7 +181,7 @@ class _CotsumiState extends State<Cotsumi> {
         ],
       ),
       /******************************************************* AppBar*/
-      drawer: CotsumiDrawer(),
+      drawer: CotsumiDrawer(userName: _loginData[0],),
       /******************************************************* Drawer*/
       body: LayoutBuilder(builder: (context, constraints) {
         deviceHeight = constraints.maxHeight;

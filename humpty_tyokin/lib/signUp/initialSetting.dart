@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/InitialGoal.dart';
-import 'package:humpty_tyokin/apiResults.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:humpty_tyokin/costomWidget/customTextField.dart';
+import 'package:humpty_tyokin/signUp/InitialGoal.dart';
+import 'package:humpty_tyokin/apiResults.dart';
 
 class InitialSetting extends StatefulWidget {
   @override
@@ -21,19 +22,20 @@ class _InitialSettingState extends State<InitialSetting> {
   /** 非表示用 */
   double nonShow = 1;
   double nonMargin = 0;
+  /** エラーメッセージ */
+  String errorMsg1 = "";
+  String errorMsg2 = "";
   @override
   void initState() {
     super.initState();
     /** キーボードが出た時の処理を書く */
     _namefocusNode.addListener(() {
       if (_namefocusNode.hasFocus) {
-        print('フォーカスした');
         setState(() {
           nonShow = 0;
           nonMargin = 1;
         });
       } else {
-        print('フォーカスが外れた');
         setState(() {
           nonShow = 1;
           nonMargin = 0;
@@ -51,7 +53,7 @@ class _InitialSettingState extends State<InitialSetting> {
         print('フォーカスが外れた');
         setState(() {
           nonShow = 1;
-          nonMargin = 1;
+          nonMargin = 0;
         });
       }
     });
@@ -69,6 +71,15 @@ class _InitialSettingState extends State<InitialSetting> {
     double deviceHeight;
     double deviceWidth;
     double textFieldHeight = 150;
+    BoxDecoration backColor = BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        stops: [0.1, 0.4, 0.8,],
+        colors: [Colors.white, Theme.of(context).primaryColor, Theme.of(context).accentColor,],
+      ),
+    );
+    
 
     return  WillPopScope(
       onWillPop: ()async=> false,
@@ -82,7 +93,7 @@ class _InitialSettingState extends State<InitialSetting> {
             child: Container(
               height: deviceHeight,
               width: deviceWidth,
-              color: Color(0xff85b103),
+              decoration: backColor,
               child: Column(
                 children: [
                   Container(
@@ -99,11 +110,7 @@ class _InitialSettingState extends State<InitialSetting> {
                   Container(
                     alignment: Alignment.bottomCenter,
                     height: (deviceHeight - textFieldHeight) * 0.3 * nonShow,
-                    child: Container(
-                          height: 100,
-                          width: 100,
-                          color: Colors.yellowAccent,
-                        ),
+                    child: Image.asset('images/cotsumirogoTrim.png',width: 100,),
                   ),
                   Container(
                     alignment: Alignment.bottomCenter,
@@ -117,31 +124,43 @@ class _InitialSettingState extends State<InitialSetting> {
                       ),
                     )
                   ),
-                  Container(
-                    alignment: Alignment.center,
-                    height: textFieldHeight,
-                    margin:  EdgeInsets.only(top: 40 * nonMargin),
-                    child: Column(
-                      children: [
-                        CustomTextField(
-                          width: deviceWidth * 0.85,
-                          height: 50,
-                          hintText: "ニックネーム",
-                          focusNode: _namefocusNode,
-                          controller: nameController,
-                          keyboardType: TextInputType.name,
-                        ),
-                        CustomTextField(
-                          width: deviceWidth * 0.85,
-                          height: 50,
-                          hintText: "パスワード",
-                          focusNode: _passfocusNode,
-                          controller: passController,
-                          obscureText: true,
-                          keyboardType: TextInputType.visiblePassword,
-                        ),
-                      ],
-                    )
+                  Stack(
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        height: textFieldHeight,
+                        margin:  EdgeInsets.only(top: 40 * nonMargin),
+                        child: Column(
+                          children: [
+                            CustomTextField(
+                              width: deviceWidth * 0.85,
+                              height: 50,
+                              hintText: "ニックネーム",
+                              focusNode: _namefocusNode,
+                              controller: nameController,
+                              keyboardType: TextInputType.name,
+                            ),
+                            CustomTextField(
+                              width: deviceWidth * 0.85,
+                              height: 50,
+                              hintText: "パスワード",
+                              focusNode: _passfocusNode,
+                              controller: passController,
+                              obscureText: true,
+                              keyboardType: TextInputType.visiblePassword,
+                            ),
+                          ],
+                        )
+                      ),
+                      Container(
+                        alignment: Alignment.topCenter,
+                        margin: EdgeInsets.only(top: 40 * nonMargin),
+                        child: Text(errorMsg1, style: TextStyle(color: Colors.redAccent, fontSize: 12),),),
+                      Container(
+                        alignment: Alignment.topCenter,
+                        margin: EdgeInsets.only(top: 40 * nonMargin + 70),
+                        child: Text(errorMsg2, style: TextStyle(color: Colors.redAccent, fontSize: 12),),)
+                    ],
                   ),
                   Container(
                     alignment: Alignment.topCenter,
@@ -151,23 +170,29 @@ class _InitialSettingState extends State<InitialSetting> {
                     child: FlatButton(
                       height: 35,
                       minWidth: 140,
-                      child: Text('貯金額設定',style: TextStyle(color: Color(0xff85b103)),),
+                      child: Text('貯金額設定',style: TextStyle(color: Theme.of(context).accentColor),),
                       color: Colors.white,
                       shape: StadiumBorder(),
-                      onPressed: () {
+                      onPressed: () async {
                         /** 正規表現 */
                         bool flg = true;
-                        if(!RegExp(r'^[0-9a-zA-Z]{6,10}$').hasMatch(nameController.text)){
-                          print(nameController);
+                        setState(() => errorMsg1 = "");
+                        setState(() => errorMsg2 = "");
+                        if(!RegExp(r'^[0-9a-zA-Zぁ-んァ-ヴ]{1,20}$').hasMatch(nameController.text)){
+                          // print(nameController);
+                          setState(() => errorMsg1 = "名前は半角英数,全角ひらがなカタカナ20字までです。");
+                          print(errorMsg1);
                           flg = false;
                         }
-                        if(!RegExp(r'^[0-9a-zA-Z]{6,10}$').hasMatch(passController.text)){
-                          print(passController);
+                        if(!RegExp(r'^[0-9a-zA-Z]{6}$').hasMatch(passController.text)){
+                          // print(passController);
+                          setState(() => errorMsg2 = "パスワードは半角英数6字です。");
+                          print(errorMsg2);
                           flg = false;
                         }
                         /** OKだったら登録して次へ */
                         if(flg){
-                          // signUp(nameController.text,passController.text);
+                          await signUp(nameController.text,passController.text);
                           /** 次へ */
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) {
@@ -185,9 +210,6 @@ class _InitialSettingState extends State<InitialSetting> {
               ),
             )
           );
-          
-          
-          
         })
       )
     );
@@ -197,21 +219,24 @@ class _InitialSettingState extends State<InitialSetting> {
   Future<void> signUp(String name, String pass) async {
         bool flg = false;
         while (!flg) {
+          // TODO API完成まではここの処理はコメントアウト
           /** サーバーへデータを送信 */
-          httpRes = await fetchApiResults(
-            "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-            new SignUpRequest(username: name, userpass: pass).toJson()
-          );
-          /** 成功したら端末に保存 */
-          if(httpRes.message != "Failed"){
+          // httpRes = await fetchApiResults(
+          //   "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+          //   new SignUpRequest(username: name, userpass: pass).toJson()
+          // );
+          // /** 成功したら端末に保存 */
+          // if(httpRes.message != "Failed"){
             SharedPreferences prefs = await SharedPreferences.getInstance();
             await prefs.setString("myname", name);
             await prefs.setString("mypass", pass);
             await prefs.setBool("first", true);
             await prefs.setBool("login", true);
+            print("a");
             flg = true;
-          }
+          // }
         }
+        print("w");
   }
 
 }

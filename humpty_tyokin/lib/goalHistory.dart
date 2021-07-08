@@ -74,8 +74,8 @@ class _GoalHistoryState extends State<GoalHistory> {
                           return null;
                         }
                         return CotsumiGoalCard(
-                          entryDate: _goaldata[index].date,
-                          achieveDate: _goaldata[index].date,
+                          entryDate: _goaldata[index].entryDate,
+                          achieveDate: _goaldata[index].achieveDate,
                           money: _goaldata[index].goal,
                           flg: _goaldata[index].flg,
                         );

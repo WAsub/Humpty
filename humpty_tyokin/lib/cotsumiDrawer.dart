@@ -23,7 +23,7 @@ class CotsumiDrawer extends StatelessWidget {
       Icon(CotsumiIcons.group),
     ];
     List<Widget> titleText = [
-      Text(this.userName),
+      Text(this.userName, style: TextStyle(color: Colors.white),),
       Text("お知らせ"),
       Text("アカウント設定"),
       Text("達成履歴"),

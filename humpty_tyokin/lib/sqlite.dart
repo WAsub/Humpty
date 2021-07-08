@@ -43,13 +43,15 @@ class Thokin {
 }
 
 class Goal {
-  DateTime date;
+  DateTime entryDate;
+  DateTime achieveDate;
   int goal;
   String memo;
   bool flg;
 
   Goal({
-    this.date,
+    this.entryDate,
+    this.achieveDate,
     this.goal,
     this.memo,
     this.flg,
@@ -57,7 +59,8 @@ class Goal {
 
   Map<String, dynamic> toMap() {
     return {
-      'date': date,
+      'entryDate': entryDate,
+      'achieveDate': achieveDate,
       'goal': goal,
       'memo': memo,
       'flg': flg,
@@ -66,7 +69,7 @@ class Goal {
 
   @override
   String toString() {
-    return 'Thokin{date: $date, goal: $goal, memo: $memo, flg: $flg}';
+    return 'Thokin{entryDate: $entryDate, achieveDate: $achieveDate, goal: $goal, memo: $memo, flg: $flg}';
   }
 }
 
@@ -90,7 +93,8 @@ class SQLite {
         await db.execute(
           "CREATE TABLE goals("
           "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-          "date TEXT, "
+          "entryDate TEXT, "
+          "achieveDate TEXT, "
           "goal INTEGER, "
           "memo TEXT, "
           "flg INTEGER)",
@@ -111,15 +115,6 @@ class SQLite {
         await db.execute(
           'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-12 16:25:08", 200, 0, 0, 0, 0, 2, 0)',
         );
-        // await db.execute(
-        //   'INSERT INTO moneys(money, date) VALUES(1000, "2021-01-03")',
-        // );
-        // await db.execute(
-        //   'INSERT INTO moneys(money, date) VALUES(257, "2021-01-03")',
-        // );
-        // await db.execute(
-        //   'INSERT INTO moneys(money, date) VALUES(8000, "2021-01-07")',
-        // );
       },
       version: 1,
     );
@@ -211,7 +206,8 @@ class SQLite {
     List<Goal> list = [];
     for (int i = 0; i < maps.length; i++) {
       list.add(Goal(
-        date: DateTime.parse(maps[i]['date']),
+        entryDate: DateTime.parse(maps[i]['entryDate']),
+        achieveDate: DateTime.parse(maps[i]['achieveDate']),
         goal: maps[i]['goal'],
         memo: maps[i]['memo'],
         flg: maps[i]['flg'] != 0 ? true : false,
@@ -225,15 +221,13 @@ class SQLite {
     final Database db = await database;
     List<Map<String, dynamic>> maps = [];
     maps = await db.rawQuery('SELECT * FROM goals WHERE id = (SELECT MAX(id) FROM goals)');
-    // print(await db.rawQuery('SELECT * FROM goals WHERE id = (SELECT MAX(id) FROM goals)'));
-    // print(maps.isNotEmpty);
-    // print(maps == null);
     Goal maxGoal;
     maxGoal = maps.isEmpty
         ?
         // データが空の場合
         Goal(
-            date: null,
+            entryDate: null,
+            achieveDate: null,
             goal: null,
             memo: null,
             flg: true,
@@ -241,49 +235,57 @@ class SQLite {
         :
         // データがある場合
         Goal(
-            date: DateTime.parse(maps[0]['date']),
+            entryDate: DateTime.parse(maps[0]['entryDate']),
+            achieveDate: maps[0]['achieveDate'] == null ? null : DateTime.parse(maps[0]['achieveDate']),
             goal: maps[0]['goal'],
             memo: maps[0]['memo'],
             flg: maps[0]['flg'] != 0 ? true : false,
           );
-    // print(maxGoal);
     return maxGoal;
   }
-
-  /** 目標リスト登録用 */
-  static Future<void> insertGoals(List<Goal> goal) async {
-    DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
+  /** 今の目標取得(日付順にIDふっているのでIDの最大値の行) */
+  static Future<int> getGoalNowId() async {
     final Database db = await database;
-    // リストを順番に登録
-    for (int i = 0; i < goal.length; i++) {
-      await db.rawInsert('INSERT INTO goals(date, goal, memo, flg) VALUES (?, ?, ?, ?)', [
-        format.format(goal[i].date),
-        goal[i].goal,
-        goal[i].memo,
-        goal[i].flg,
-      ]);
-    }
+    List<Map<String, dynamic>> maps = [];
+    maps = await db.rawQuery('SELECT MAX(id) FROM goals');
+    int maxGoalId;
+    maxGoalId = maps.isEmpty ? null : maps[0]['MAX(id)'];
+    return maxGoalId;
   }
-
   /** 目標登録用 */
   static Future<void> insertGoal(Goal goal) async {
     DateTime now = DateTime.now();
     DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
     final Database db = await database;
     // リストを順番に登録
-    await db.rawInsert('INSERT INTO goals(date, goal, memo, flg) VALUES (?, ?, ?, ?)', [
+    await db.rawInsert('INSERT INTO goals(entryDate, achieveDate, goal, memo, flg) VALUES (?, ?, ?, ?, ?)', [
       format.format(now),
+      null,
       goal.goal,
       goal.memo,
       false,
     ]);
   }
-
-  /** 貯金リスト全削除用 */
-  static Future<void> deleteGoal() async {
-    final db = await database;
-    await db.delete(
-      'goals',
+  /** 現在目標更新用 */
+  static Future<void> updateNowGoal(int money) async {
+    int nowID = await getGoalNowId();
+    final Database db = await database;
+    // リストを順番に登録
+    await db.rawInsert(
+      'UPDATE goals SET goal = ? WHERE id = ?', 
+      [money, nowID]
+    );
+  }
+  /** 目標達成登録用 */
+  static Future<void> achieveNowGoal(bool flg) async {
+    int nowID = await getGoalNowId();
+    DateTime now = DateTime.now();
+    DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
+    final Database db = await database;
+    // リストを順番に登録
+    await db.rawInsert(
+      'UPDATE goals SET flg = ?, achieveDate = ? WHERE id = ?', 
+      [flg, format.format(now), nowID]
     );
   }
 }

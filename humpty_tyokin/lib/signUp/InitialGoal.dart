@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/apiResults.dart';
+
 import 'package:humpty_tyokin/costomWidget/customTextField.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:humpty_tyokin/apiResults.dart';
+import 'package:humpty_tyokin/sqlite.dart';
 
 class InitialGoal extends StatefulWidget {
   @override
@@ -11,22 +12,24 @@ class InitialGoal extends StatefulWidget {
 class _InitialGoalState extends State<InitialGoal> {
   /** HTTP通信 */
   ApiResults httpRes;
+  /** テキストコントローラとフォーカス */
   var goalController = TextEditingController();
-
   final _goalfocusNode = FocusNode();
-
+  /** キーボード出たときに調整する用 */
   double nonShow = 1;
+  /** エラーメッセージ */
+  String errorMsg = "";
+
+
   @override
   void initState() {
     super.initState();
     _goalfocusNode.addListener(() {
       if (_goalfocusNode.hasFocus) {
-        print('フォーカスした');
         setState(() {
           nonShow = 0;
         });
       } else {
-        print('フォーカスが外れた');
         setState(() {
           nonShow = 1;
         });
@@ -39,12 +42,13 @@ class _InitialGoalState extends State<InitialGoal> {
     goalController.dispose();
     super.dispose();
   }
+  
   @override
   Widget build(BuildContext context) {
     double deviceHeight;
     double deviceWidth;
     double textFieldHeight = 150;
-
+    
     return  WillPopScope(
       onWillPop: ()async=> false,
       child: Scaffold(
@@ -57,7 +61,7 @@ class _InitialGoalState extends State<InitialGoal> {
             child: Container(
               height: deviceHeight,
               width: deviceWidth,
-              color: Color(0xff85b103),
+              color: Theme.of(context).accentColor,
               child: Column(
                 children: [
                   Container(
@@ -74,11 +78,7 @@ class _InitialGoalState extends State<InitialGoal> {
                   Container(
                     alignment: Alignment.bottomCenter,
                     height: (deviceHeight - textFieldHeight) * 0.3 * nonShow,
-                    child: Container(
-                          height: 100,
-                          width: 100,
-                          color: Colors.yellowAccent,
-                        ),
+                    child: Image.asset('images/cotsumirogoTrim.png',width: 100,),
                   ),
                   Container(
                     alignment: Alignment.bottomCenter,
@@ -92,19 +92,25 @@ class _InitialGoalState extends State<InitialGoal> {
                       ),
                     )
                   ),
-                  Container(
-                    alignment: Alignment.topCenter,
-                    height: 150,
-                    child: CustomTextField(
-                          width: deviceWidth * 0.85,
-                          height: 50,
-                          margin: EdgeInsets.only(top: 60),
-                          hintText: "目標金額",
-                          focusNode: _goalfocusNode,
-                          controller: goalController,
-                          keyboardType: TextInputType.number,
-                        ),
-                  ),
+                  Stack(children: [
+                    Container(
+                      alignment: Alignment.topCenter,
+                      height: 150,
+                      child: CustomTextField(
+                            width: deviceWidth * 0.85,
+                            height: 50,
+                            margin: EdgeInsets.only(top: 60),
+                            hintText: "目標金額",
+                            focusNode: _goalfocusNode,
+                            controller: goalController,
+                            keyboardType: TextInputType.number,
+                          ),
+                    ),
+                    Container(
+                        alignment: Alignment.topCenter,
+                        margin: EdgeInsets.only(top: 20),
+                        child: Text(errorMsg, style: TextStyle(color: Colors.redAccent, fontSize: 12),),)
+                  ],),
                   Container(
                     alignment: Alignment.topCenter,
                     height: ((deviceHeight- textFieldHeight) * 0.4 - 30),
@@ -117,10 +123,15 @@ class _InitialGoalState extends State<InitialGoal> {
                       color: Colors.white,
                       shape: StadiumBorder(),
                       onPressed: () {
-                        bool flg = true;
+                        bool flg = false;
+                        setState(() => errorMsg = "");
                         /** 数字なら通す */
-                        if(!RegExp(r'^\d+$').hasMatch(goalController.text)){
+                        if(RegExp(r'^\d+$').hasMatch(goalController.text)){
                           print(goalController);
+                          goalSet(int.parse(goalController.text));
+                          flg = true;
+                        }else{
+                          setState(() => errorMsg = "数字だけを入力してください。\n(何も入力しない場合はスキップします)");
                           flg = false;
                         }
                         /** 設定しない場合も通す */
@@ -129,7 +140,6 @@ class _InitialGoalState extends State<InitialGoal> {
                         }
                         if(flg){
                           print("ddd");
-                          // goalSet(int.parse(goalController.text));
                           /** ここまで終わったらメイン画面に戻す */
                           Navigator.pop(context,);
                         }
@@ -150,31 +160,9 @@ class _InitialGoalState extends State<InitialGoal> {
   
   /** 登録 */
   Future<void> goalSet(int goal) async {
-    // memoizer.runOnce(
-    //   () async {
-        // bool flg = false;
-        // while (!flg) {
-        //   /** サーバーへデータを送信 */
-        //   httpRes = await fetchApiResults(
-        //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-        //     new SignUpRequest(username: name, userpass: pass).toJson()
-        //   );
-        //   /** 成功したら端末に保存 */
-        //   if(httpRes.message != "Failed"){
-        //     SharedPreferences prefs = await SharedPreferences.getInstance();
-        //     await prefs.setString("myname", name);
-        //     await prefs.setString("mypass", pass);
-        //     await prefs.setBool("first", true);
-        //     await prefs.setBool("login", true);
-        //     flg = true;
-        //   }
-        // }
-        
-        
-    //   },
-    // );
+    Goal _goal = Goal(goal: goal,);
+    await SQLite.insertGoal(_goal);
   }
-
 }
 
 class SignUpRequest {

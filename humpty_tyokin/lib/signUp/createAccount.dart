@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/initialSetting.dart';
+
+import 'package:humpty_tyokin/signUp/initialSetting.dart';
+
 class CreateAccount extends StatefulWidget {
   @override
   _CreateAccountState createState() => _CreateAccountState();
@@ -9,13 +11,12 @@ class _CreateAccountState extends State<CreateAccount> {
   Widget build(BuildContext context) {
     double deviceHeight;
     double deviceWidth;
-
     BoxDecoration backColor = BoxDecoration(
       gradient: LinearGradient(
         begin: Alignment.bottomCenter,
         end: Alignment.topCenter,
-        stops: [0.2, 0.7,],
-        colors: [Color(0xff85b103), Colors.white,],
+        stops: [0.1, 0.4, 0.8,],
+        colors: [Theme.of(context).accentColor, Theme.of(context).primaryColor, Colors.white,],
       ),
     );
 
@@ -35,17 +36,15 @@ class _CreateAccountState extends State<CreateAccount> {
               children: [
                 /** アイコン */
                 Container(
+                  alignment: Alignment.bottomCenter,
                   height: deviceHeight*0.5,
-                  child: Container(
-                    height: 50,
-                    width: 100,
-                    color: Colors.yellowAccent,
-                  ),
+                  margin: EdgeInsets.only(bottom: 10),
+                  child: Image.asset('images/cotsumirogoTrim.png',width: 200,),
                 ),
                 Container(
                   alignment: Alignment.center,
                   height: deviceHeight*0.2,
-                  child: Text("新しい貯金アプリ\n\n\n\n私たちと貯金を始めましょう！",
+                  child: Text("お金管理アプリ\n\n\n\n私たちと貯金を始めましょう！",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
@@ -60,13 +59,13 @@ class _CreateAccountState extends State<CreateAccount> {
                   child: FlatButton(
                     height: 35,
                     minWidth: 140,
-                    child: Text('設定を行う',style: TextStyle(color: Color(0xff85b103)),),
+                    child: Text('設定を行う',style: TextStyle(color: Theme.of(context).accentColor),),
                     color: Colors.white,
                     shape: StadiumBorder(),
                     onPressed: () {
                       Navigator .of(context).push(
                         MaterialPageRoute(builder: (context) {
-                           // 初期設定へ
+                          // アカウント設定へ
                           return InitialSetting();}),
                       ).then((value) async{
                         /** メイン画面まで戻す */
@@ -82,5 +81,4 @@ class _CreateAccountState extends State<CreateAccount> {
       )
     );
   }
-
 }
