@@ -7,6 +7,7 @@ class CustomTextField extends StatefulWidget{
   Color backgroundColor = Colors.white;
   final FocusNode focusNode;
   final TextEditingController controller;
+  String labelText;
   String hintText = "";
   double hintFontSize = 17;
   double fontSize = 17;
@@ -21,6 +22,7 @@ class CustomTextField extends StatefulWidget{
     this.backgroundColor,
     this.focusNode,
     this.controller,
+    this.labelText,
     this.hintText,
     this.hintFontSize,
     this.fontSize,
@@ -62,6 +64,7 @@ class CustomTextFieldState extends State<CustomTextField> {
               width: 1.5,
                 color: Theme.of(context).accentColor,
             ),),
+          labelText: widget.labelText,
           hintText: widget.hintText,
           hintStyle: TextStyle(fontSize: widget.hintFontSize,),
           border: OutlineInputBorder(

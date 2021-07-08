@@ -183,7 +183,7 @@ class _CotsumiState extends State<Cotsumi> {
         ],
       ),
       /******************************************************* AppBar*/
-      drawer: CotsumiDrawer(userName: _loginData[1],),
+      drawer: CotsumiDrawer(userName: _loginData[1], goal: goal,),
       /******************************************************* Drawer*/
       body: LayoutBuilder(builder: (context, constraints) {
         deviceHeight = constraints.maxHeight;

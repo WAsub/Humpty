@@ -8,9 +8,11 @@ import 'package:humpty_tyokin/settingAccount.dart';
 
 class CotsumiDrawer extends StatelessWidget {
   String userName;
+  int goal;
 
   CotsumiDrawer({
     this.userName,
+    this.goal,
   });
 
   @override
@@ -31,7 +33,7 @@ class CotsumiDrawer extends StatelessWidget {
     var onTap = [
       null,
       null,
-      SettingAccount(),
+      SettingAccount(myname: this.userName, goal: this.goal,),
       GoalHistory(),
     ];
     return Drawer(

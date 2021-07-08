@@ -1,18 +1,28 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+import 'package:humpty_tyokin/apiResults.dart';
 import 'package:humpty_tyokin/costomWidget/cotsumiGoalCard.dart';
 import 'package:humpty_tyokin/costomWidget/customTextField.dart';
 import 'package:humpty_tyokin/cotsumiDrawer.dart';
 import 'package:humpty_tyokin/sqlite.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingAccount extends StatefulWidget {
-  const SettingAccount({Key key}) : super(key: key);
+  String myname;
+  int goal;
+  SettingAccount({
+    this.myname,
+    this.goal,
+    Key key
+  }) : super(key: key);
 
   @override
   _SettingAccountState createState() => _SettingAccountState();
 }
 
 class _SettingAccountState extends State<SettingAccount> {
+  /** HTTP通信 */
+  ApiResults httpRes;
   /** テキストコントローラ */
   var nameController = TextEditingController();
   var goalController = TextEditingController();
@@ -22,9 +32,16 @@ class _SettingAccountState extends State<SettingAccount> {
   /** 非表示用 */
   double nonShow = 1;
   double nonMargin = 0;
+  /** エラーメッセージ */
+  String errorMsg1 = "";
+  String errorMsg2 = "";
+
   @override
   void initState() {
     super.initState();
+    /** 今の名前と目標金額をセット */
+    nameController = TextEditingController(text: widget.myname);
+    goalController = TextEditingController(text: widget.goal.toString());
     /** キーボードが出た時の処理を書く */
     _namefocusNode.addListener(() {
       if (_namefocusNode.hasFocus) {
@@ -53,14 +70,12 @@ class _SettingAccountState extends State<SettingAccount> {
       }
     });
   }
-
   @override
   void dispose() {
     nameController.dispose();
     goalController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +112,8 @@ class _SettingAccountState extends State<SettingAccount> {
                   height: 100 * nonShow,
                   alignment: Alignment.bottomCenter,
                 ),
-                Container(
+                Stack(children: [
+                  Container(
                     alignment: Alignment.center,
                     height: textFieldHeight,
                     margin:  EdgeInsets.only(top: 40 * nonMargin),
@@ -106,7 +122,7 @@ class _SettingAccountState extends State<SettingAccount> {
                         CustomTextField(
                           width: deviceWidth * 0.85,
                           height: 50,
-                          hintText: "ニックネーム",
+                          labelText: "ニックネーム",
                           focusNode: _namefocusNode,
                           controller: nameController,
                           keyboardType: TextInputType.name,
@@ -114,53 +130,65 @@ class _SettingAccountState extends State<SettingAccount> {
                         CustomTextField(
                           width: deviceWidth * 0.85,
                           height: 50,
-                          hintText: "目標金額",
+                          labelText: "目標金額",
                           focusNode: _goalfocusNode,
                           controller: goalController,
-                          obscureText: true,
                           keyboardType: TextInputType.number,
                         ),
                       ],
                     )
                   ),
-                  Container(height: 50 * nonShow,),
                   Container(
                     alignment: Alignment.topCenter,
-                    margin: EdgeInsets.only(top: 30),
-                    // ignore: deprecated_member_use
-                    child: FlatButton(
-                      height: 35,
-                      minWidth: 140,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
-                      color: Theme.of(context).accentColor,
-                      shape: StadiumBorder(),
-                      child: Text('変更を保存',style: TextStyle(color: Colors.white),),
-                      onPressed: () {
-                        /** 正規表現 */
-                        bool flg = true;
-                        if(!RegExp(r'^[0-9a-zA-Z]{6,10}$').hasMatch(nameController.text)){
-                          print(nameController);
-                          flg = false;
+                    margin: EdgeInsets.only(top: 40 * nonMargin),
+                    child: Text(errorMsg1, style: TextStyle(color: Colors.redAccent, fontSize: 12),),),
+                  Container(
+                    alignment: Alignment.topCenter,
+                    margin: EdgeInsets.only(top: 40 * nonMargin + 70),
+                    child: Text(errorMsg2, style: TextStyle(color: Colors.redAccent, fontSize: 12),),)
+                ],),
+                Container(height: 50 * nonShow,),
+                Container(
+                  alignment: Alignment.topCenter,
+                  margin: EdgeInsets.only(top: 30),
+                  // ignore: deprecated_member_use
+                  child: FlatButton(
+                    height: 35,
+                    minWidth: 140,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
+                    color: Theme.of(context).accentColor,
+                    shape: StadiumBorder(),
+                    child: Text('変更を保存',style: TextStyle(color: Colors.white),),
+                    onPressed: () async {
+                      /** 正規表現 */
+                      bool flg = true;
+                      setState(() => errorMsg1 = "");
+                      setState(() => errorMsg2 = "");
+                      if(!RegExp(r'^[0-9a-zA-Zぁ-んァ-ヴ]{1,20}$').hasMatch(nameController.text)){
+                        // print(nameController);
+                        setState(() => errorMsg1 = "名前は半角英数,全角ひらがなカタカナ20字までです。");
+                        flg = false;
+                      }
+                      if(!RegExp(r'^\d+$').hasMatch(goalController.text)){
+                        // print(goalController);
+                        setState(() => errorMsg2 = "数字だけを入力してください。");
+                        flg = false;
+                      }
+                      /** OKだったら登録して次へ */
+                      if(flg){
+                        if(widget.myname != nameController.text){
+                          /** 前と違うものなら修正 */
+                          await chengeName(nameController.text);
                         }
-                        if(!RegExp(r'^[0-9]{1,10}$').hasMatch(goalController.text)){
-                          print(goalController);
-                          flg = false;
+                        if(widget.goal != int.parse(goalController.text)){
+                          /** 前と違うものなら修正 */
+                          
                         }
-                        /** OKだったら登録して次へ */
-                        // if(flg){
-                        //   // signUp(nameController.text,passController.text);
-                        //   /** 次へ */
-                        //   // Navigator.of(context).push(
-                        //   //   MaterialPageRoute(builder: (context) {
-                        //   //     // 目標設定へ
-                        //   //     return InitialGoal();}),
-                        //   // ).then((value) async{
-                        //   //   /** メイン画面まで戻す */
-                        //   //   Navigator.pop(context,);
-                        //   // });
-                        // }
-                      },
-                    )),
+                        /** 戻る */
+                        Navigator.pop(context,);
+                      }
+                    },
+                  )),
               ],
             ),
         )
@@ -168,4 +196,62 @@ class _SettingAccountState extends State<SettingAccount> {
       }),
     );
   }
+
+  /** 登録 */
+  Future<void> chengeName(String name) async {
+    bool flg = false;
+    while (!flg) {
+      // TODO API完成まではここの処理はコメントアウト
+      /** サーバーへデータを送信 */
+      httpRes = await fetchApiResults(
+        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        new chengeNameRequest(username: name,).toJson()
+      );
+      /** 成功したら端末に保存 */
+      if(httpRes.message != "Failed"){
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("myname", name);
+        flg = true;
+      }
+    }
+  }
+  /** 登録 */
+  Future<void> goalSet(int goal) async {
+    /** ローカルに保存 */
+    Goal _goal = Goal(goal: goal,);
+    await SQLite.insertGoal(_goal);
+    /** さっき登録したIDを引き出して */
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String myId = (prefs.getString('myid') ?? "");
+    /** 目標リスト引き出してIDを穴埋め */
+    List<Goal> list = await SQLite.getGoal();
+    for(int i = 0; i < list.length; i++){
+      list[i].userId = myId;
+    }
+    print(list);
+    // TODO API完成まではここの処理はコメントアウト
+    /** サーバーへ登録 */
+    // bool flg = false;
+    // while (!flg) {
+    //   /** サーバーへデータを送信 */
+    //   httpRes = await fetchApiResults(
+    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+    //     new GoalUpdateRequest(goallist: list).toJson()
+    //   );
+    //   /** 成功したら端末に保存 */
+    //   if(httpRes.message != "Failed"){
+    //     flg = true;
+    //   }
+    // }
+  }
+
+}
+class chengeNameRequest {
+  final String username;
+  chengeNameRequest({
+    this.username,
+  });
+  Map<String, dynamic> toJson() => {
+    'username': username,
+  };
 }

@@ -43,6 +43,7 @@ class Thokin {
 }
 
 class Goal {
+  String userId;
   DateTime entryDate;
   DateTime achieveDate;
   int goal;
@@ -50,6 +51,7 @@ class Goal {
   bool flg;
 
   Goal({
+    this.userId,
     this.entryDate,
     this.achieveDate,
     this.goal,
@@ -59,6 +61,7 @@ class Goal {
 
   Map<String, dynamic> toMap() {
     return {
+      'userId': userId,
       'entryDate': entryDate,
       'achieveDate': achieveDate,
       'goal': goal,
@@ -69,7 +72,7 @@ class Goal {
 
   @override
   String toString() {
-    return 'Thokin{entryDate: $entryDate, achieveDate: $achieveDate, goal: $goal, memo: $memo, flg: $flg}';
+    return 'Thokin{userId: $userId, entryDate: $entryDate, achieveDate: $achieveDate, goal: $goal, memo: $memo, flg: $flg}';
   }
 }
 
