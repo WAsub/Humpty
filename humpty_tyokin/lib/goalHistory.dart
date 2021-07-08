@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:async/async.dart';
 
 import 'package:humpty_tyokin/costomWidget/cotsumiGoalCard.dart';
-import 'package:humpty_tyokin/sqlite.dart';
+import 'package:humpty_tyokin/data/sqlite.dart';
 class GoalHistory extends StatefulWidget {
   const GoalHistory({Key key}) : super(key: key);
 

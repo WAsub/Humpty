@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'dart:math' as math;
 
-import 'package:humpty_tyokin/sqlite.dart';
+import 'package:humpty_tyokin/data/sqlite.dart';
 
 class CoinCounter extends StatelessWidget{
   List<Thokin> thokinData = [];

@@ -1,11 +1,7 @@
-import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/apiResults.dart';
-import 'package:humpty_tyokin/costomWidget/cotsumiGoalCard.dart';
 import 'package:humpty_tyokin/costomWidget/customTextField.dart';
-import 'package:humpty_tyokin/cotsumiDrawer.dart';
-import 'package:humpty_tyokin/sqlite.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:humpty_tyokin/data/httpResponse.dart';
+import 'package:humpty_tyokin/data/sqlite.dart';
 
 class SettingAccount extends StatefulWidget {
   String myname;
@@ -21,8 +17,6 @@ class SettingAccount extends StatefulWidget {
 }
 
 class _SettingAccountState extends State<SettingAccount> {
-  /** HTTP通信 */
-  ApiResults httpRes;
   /** テキストコントローラ */
   var nameController = TextEditingController();
   var goalController = TextEditingController();
@@ -94,6 +88,7 @@ class _SettingAccountState extends State<SettingAccount> {
       body: LayoutBuilder(builder: (context, constraints) {
         deviceHeight = constraints.maxHeight;
         deviceWidth = constraints.maxWidth;
+
         return GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(), // キーボード外の画面タップでキーボードを閉じる
             child: Container(
@@ -178,11 +173,17 @@ class _SettingAccountState extends State<SettingAccount> {
                       if(flg){
                         if(widget.myname != nameController.text){
                           /** 前と違うものなら修正 */
-                          await chengeName(nameController.text);
+                          await HttpRes.chengeName(nameController.text);
                         }
-                        if(widget.goal != int.parse(goalController.text)){
+                        if(widget.goal == 0){
+                          /** 未設定なら追加 */
+                          Goal _goal = Goal(goal: int.parse(goalController.text),);
+                          await SQLite.insertGoal(_goal);
+                          await HttpRes.remoteGoalsUpdate();
+                        }else if(widget.goal != int.parse(goalController.text)){
                           /** 前と違うものなら修正 */
-                          
+                          await SQLite.updateNowGoal(int.parse(goalController.text));
+                          await HttpRes.remoteGoalsUpdate();
                         }
                         /** 戻る */
                         Navigator.pop(context,);
@@ -196,62 +197,4 @@ class _SettingAccountState extends State<SettingAccount> {
       }),
     );
   }
-
-  /** 登録 */
-  Future<void> chengeName(String name) async {
-    bool flg = false;
-    while (!flg) {
-      // TODO API完成まではここの処理はコメントアウト
-      /** サーバーへデータを送信 */
-      httpRes = await fetchApiResults(
-        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-        new chengeNameRequest(username: name,).toJson()
-      );
-      /** 成功したら端末に保存 */
-      if(httpRes.message != "Failed"){
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("myname", name);
-        flg = true;
-      }
-    }
-  }
-  /** 登録 */
-  Future<void> goalSet(int goal) async {
-    /** ローカルに保存 */
-    Goal _goal = Goal(goal: goal,);
-    await SQLite.insertGoal(_goal);
-    /** さっき登録したIDを引き出して */
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String myId = (prefs.getString('myid') ?? "");
-    /** 目標リスト引き出してIDを穴埋め */
-    List<Goal> list = await SQLite.getGoal();
-    for(int i = 0; i < list.length; i++){
-      list[i].userId = myId;
-    }
-    print(list);
-    // TODO API完成まではここの処理はコメントアウト
-    /** サーバーへ登録 */
-    // bool flg = false;
-    // while (!flg) {
-    //   /** サーバーへデータを送信 */
-    //   httpRes = await fetchApiResults(
-    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-    //     new GoalUpdateRequest(goallist: list).toJson()
-    //   );
-    //   /** 成功したら端末に保存 */
-    //   if(httpRes.message != "Failed"){
-    //     flg = true;
-    //   }
-    // }
-  }
-
-}
-class chengeNameRequest {
-  final String username;
-  chengeNameRequest({
-    this.username,
-  });
-  Map<String, dynamic> toJson() => {
-    'username': username,
-  };
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/sqlite.dart';
+import 'package:humpty_tyokin/data/sqlite.dart';
 
 import 'coinCounter.dart';
 

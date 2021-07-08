@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:humpty_tyokin/data/httpResponse.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:humpty_tyokin/costomWidget/customTextField.dart';
@@ -11,8 +12,6 @@ class InitialSetting extends StatefulWidget {
 }
 
 class _InitialSettingState extends State<InitialSetting> {
-  /** HTTP通信 */
-  ApiResults httpRes;
   /** テキストコントローラ */
   var nameController = TextEditingController();
   var passController = TextEditingController();
@@ -192,7 +191,7 @@ class _InitialSettingState extends State<InitialSetting> {
                         }
                         /** OKだったら登録して次へ */
                         if(flg){
-                          await signUp(nameController.text,passController.text);
+                          HttpRes.signUp(nameController.text,passController.text);
                           /** 次へ */
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) {
@@ -214,42 +213,4 @@ class _InitialSettingState extends State<InitialSetting> {
       )
     );
   }
-  
-  /** 登録 */
-  Future<void> signUp(String name, String pass) async {
-    bool flg = false;
-    while (!flg) {
-      // TODO API完成まではここの処理はコメントアウト
-      /** サーバーへデータを送信 */
-      // httpRes = await fetchApiResults(
-      //   "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-      //   new SignUpRequest(username: name, userpass: pass).toJson()
-      // );
-      // /** 成功したら端末に保存 */
-      // if(httpRes.message != "Failed"){
-        // String myid = httpRes.data["userid"];
-        String myid = "abc"; // TODO テスト用
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("myid", myid);
-        await prefs.setString("myname", name);
-        await prefs.setString("mypass", pass);
-        await prefs.setBool("first", true);
-        await prefs.setBool("login", true);
-        flg = true;
-      // }
-    }
-  }
-}
-
-class SignUpRequest {
-  final String username;
-  final String userpass;
-  SignUpRequest({
-    this.username,
-    this.userpass,
-  });
-  Map<String, dynamic> toJson() => {
-    'username': username,
-    'userpass': userpass,
-  };
 }
