@@ -93,3 +93,6 @@ flutter:
     - asset: fonts/RobotoMono-Light.ttf
     - asset: fonts/RobotoMono-LightItalic.ttf
     - asset: fonts/RobotoMono-ThinItalic.ttf
+
+  assets:
+    - images/
