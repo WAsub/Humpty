@@ -202,12 +202,12 @@ class SQLite {
   static Future<List<Goal>> getGoal() async {
     final Database db = await database;
     // リストを取得
-    final List<Map<String, dynamic>> maps = await db.rawQuery('SELECT * FROM goals ORDER BY date');
+    final List<Map<String, dynamic>> maps = await db.rawQuery('SELECT * FROM goals ORDER BY entryDate');
     List<Goal> list = [];
     for (int i = 0; i < maps.length; i++) {
       list.add(Goal(
         entryDate: DateTime.parse(maps[i]['entryDate']),
-        achieveDate: DateTime.parse(maps[i]['achieveDate']),
+        achieveDate: maps[0]['achieveDate'] == null ? null : DateTime.parse(maps[0]['achieveDate']),
         goal: maps[i]['goal'],
         memo: maps[i]['memo'],
         flg: maps[i]['flg'] != 0 ? true : false,

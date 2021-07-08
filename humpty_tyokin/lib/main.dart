@@ -89,6 +89,7 @@ class _CotsumiState extends State<Cotsumi> {
         }),
       ).then((value) async{
         /** リロード */
+        isLogin();
         loading();
       });
     }
@@ -96,10 +97,11 @@ class _CotsumiState extends State<Cotsumi> {
   /** ログイン */
   isLogin() async {
     final SharedPreferences prefs = await _prefs;
+    final String myId = (prefs.getString('myid') ?? "");
     final String myAct = (prefs.getString('myname') ?? "");
     final String mypass = (prefs.getString('mypass') ?? "");
     if(myAct != "" && mypass != ""){
-      setState(() => _loginData = [myAct, mypass]);
+      setState(() => _loginData = [myId, myAct, mypass]);
     }else{
       // Navigator.of(context).push(
       //   MaterialPageRoute(builder: (context) {
@@ -181,7 +183,7 @@ class _CotsumiState extends State<Cotsumi> {
         ],
       ),
       /******************************************************* AppBar*/
-      drawer: CotsumiDrawer(userName: _loginData[0],),
+      drawer: CotsumiDrawer(userName: _loginData[1],),
       /******************************************************* Drawer*/
       body: LayoutBuilder(builder: (context, constraints) {
         deviceHeight = constraints.maxHeight;

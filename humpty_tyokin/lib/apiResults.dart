@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 class ApiResults {
   final String message;
-  final List<dynamic> data;
+  final dynamic data;
   ApiResults({
     this.message,
     this.data,

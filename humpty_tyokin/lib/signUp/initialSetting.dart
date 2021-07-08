@@ -217,28 +217,28 @@ class _InitialSettingState extends State<InitialSetting> {
   
   /** 登録 */
   Future<void> signUp(String name, String pass) async {
-        bool flg = false;
-        while (!flg) {
-          // TODO API完成まではここの処理はコメントアウト
-          /** サーバーへデータを送信 */
-          // httpRes = await fetchApiResults(
-          //   "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-          //   new SignUpRequest(username: name, userpass: pass).toJson()
-          // );
-          // /** 成功したら端末に保存 */
-          // if(httpRes.message != "Failed"){
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setString("myname", name);
-            await prefs.setString("mypass", pass);
-            await prefs.setBool("first", true);
-            await prefs.setBool("login", true);
-            print("a");
-            flg = true;
-          // }
-        }
-        print("w");
+    bool flg = false;
+    while (!flg) {
+      // TODO API完成まではここの処理はコメントアウト
+      /** サーバーへデータを送信 */
+      // httpRes = await fetchApiResults(
+      //   "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+      //   new SignUpRequest(username: name, userpass: pass).toJson()
+      // );
+      // /** 成功したら端末に保存 */
+      // if(httpRes.message != "Failed"){
+        // String myid = httpRes.data["userid"];
+        String myid = "abc"; // TODO テスト用
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("myid", myid);
+        await prefs.setString("myname", name);
+        await prefs.setString("mypass", pass);
+        await prefs.setBool("first", true);
+        await prefs.setBool("login", true);
+        flg = true;
+      // }
+    }
   }
-
 }
 
 class SignUpRequest {

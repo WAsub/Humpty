@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:humpty_tyokin/costomWidget/customTextField.dart';
 import 'package:humpty_tyokin/apiResults.dart';
 import 'package:humpty_tyokin/sqlite.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InitialGoal extends StatefulWidget {
   @override
@@ -139,7 +140,6 @@ class _InitialGoalState extends State<InitialGoal> {
                           flg = true;
                         }
                         if(flg){
-                          print("ddd");
                           /** ここまで終わったらメイン画面に戻す */
                           Navigator.pop(context,);
                         }
@@ -150,9 +150,6 @@ class _InitialGoalState extends State<InitialGoal> {
               ),
             )
           );
-          
-          
-          
         })
       )
     );
@@ -160,20 +157,40 @@ class _InitialGoalState extends State<InitialGoal> {
   
   /** 登録 */
   Future<void> goalSet(int goal) async {
+    /** ローカルに保存 */
     Goal _goal = Goal(goal: goal,);
     await SQLite.insertGoal(_goal);
+    /** さっき登録したIDを引き出して */
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String myId = (prefs.getString('myid') ?? "");
+    /** 目標リスト引き出してIDを穴埋め */
+    List<Goal> list = await SQLite.getGoal();
+    for(int i = 0; i < list.length; i++){
+      list[i].userId = myId;
+    }
+    print(list);
+    // TODO API完成まではここの処理はコメントアウト
+    /** サーバーへ登録 */
+    // bool flg = false;
+    // while (!flg) {
+    //   /** サーバーへデータを送信 */
+    //   httpRes = await fetchApiResults(
+    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+    //     new GoalUpdateRequest(goallist: list).toJson()
+    //   );
+    //   /** 成功したら端末に保存 */
+    //   if(httpRes.message != "Failed"){
+    //     flg = true;
+    //   }
+    // }
   }
 }
-
-class SignUpRequest {
-  final String username;
-  final String userpass;
-  SignUpRequest({
-    this.username,
-    this.userpass,
+class GoalUpdateRequest {
+  final List<Goal> goallist;
+  GoalUpdateRequest({
+    this.goallist,
   });
   Map<String, dynamic> toJson() => {
-        'username': username,
-        'userpass': userpass,
-      };
+    'goallist': goallist,
+  };
 }
