@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/data/httpResponse.dart';
-import 'package:humpty_tyokin/goalHistory.dart';
-import 'package:humpty_tyokin/settingAccount.dart';
 import 'dart:async';
-import 'data/sqlite.dart';
 import 'package:async/async.dart';
+import 'package:humpty_tyokin/achieveDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
-import 'package:humpty_tyokin/theme/dynamic_theme.dart';
 import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
 import 'package:humpty_tyokin/costomWidget/customParameter.dart';
 import 'package:humpty_tyokin/costomWidget/swipeCoinCounter.dart';
-import 'package:humpty_tyokin/weeklyThokin.dart';
+import 'package:humpty_tyokin/data/httpResponse.dart';
+import 'package:humpty_tyokin/data/sqlite.dart';
 import 'package:humpty_tyokin/signUp/createAccount.dart';
+import 'package:humpty_tyokin/theme/dynamic_theme.dart';
+import 'package:humpty_tyokin/goalHistory.dart';
+import 'package:humpty_tyokin/settingAccount.dart';
+import 'package:humpty_tyokin/weeklyThokin.dart';
 
 void main() => runApp(MyApp());
 
@@ -115,11 +116,31 @@ class _CotsumiState extends State<Cotsumi> {
     }
   }
 
+  /** 目標達成しているか */
+  Future<void> isAchieve() async {
+    /** 目標達成していたらダイアログ表示 */
+    if(goal == 0){
+      return;
+    }else if(total >= goal){
+      /** 目標達成登録 */
+      await SQLite.achieveNowGoal(true);
+      await HttpRes.remoteGoalsUpdate();
+      /** ダイアログ表示 */
+      await showDialog<int>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AchieveDialog(goal: goal,);
+        }
+      );
+      await loading();
+    }
+  }
+
   /** ローディング処理 */
   Future<void> loading() async {
     /** 更新終わるまでグルグルを出しとく */
     setState(() => cpi = CircularProgressIndicator());
-    await new Future.delayed(new Duration(milliseconds: 3000));
     /** サーバーからデータを取得してローカルのデータを入れ替え */
     HttpRes.getThokinData();
     /** データを取得 */
@@ -141,6 +162,8 @@ class _CotsumiState extends State<Cotsumi> {
     setState(() => weeklyNowShow = DateTime.parse("2021-01-03 15:25:07")); // TODO テスト用
     List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
     _streamController.sink.add(getweeklist); // StreamBuilderに流して部分生成
+    /** 目標達成したか判定 */
+    isAchieve();
     /** グルグル終わり */
     setState(() => cpi = null);
     // print(_thokinData);
@@ -151,18 +174,16 @@ class _CotsumiState extends State<Cotsumi> {
   Widget build(BuildContext context) {
     /** Drawer */
     List<Widget> leadingIcon = [
-      Icon(Icons.radio_button_off),
-      Icon(CotsumiIcons.osiraseicon),
-      Icon(CotsumiIcons.group),
-      Icon(CotsumiIcons.group),
+      Image.asset('images/cotsumirogoTrim.png',width: 40,),
+      Icon(CotsumiIcons.osiraseicon, color: Theme.of(context).primaryColor,),
+      Icon(Icons.account_circle_sharp, color: Theme.of(context).primaryColor,),
+      Icon(CotsumiIcons.group, color: Theme.of(context).primaryColor,),
     ];
     List<Widget> titleText = [
-      Text(
-        _loginData[1],
-      ),
-      Text("お知らせ"),
-      Text("アカウント設定"),
-      Text("達成履歴"),
+      Text("  "+_loginData[1], style: TextStyle(color: Colors.black54),),
+      Text("お知らせ", style: TextStyle(color: Colors.black54),),
+      Text("アカウント設定", style: TextStyle(color: Colors.black54),),
+      Text("達成履歴", style: TextStyle(color: Colors.black54),),
     ];
     var onTap = [
       null,

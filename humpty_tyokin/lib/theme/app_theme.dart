@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'color.dart';
 
 class AppTheme {
@@ -40,14 +41,14 @@ class AppTheme {
     return TextTheme(
       bodyText1: TextStyle(color: color),
       bodyText2: TextStyle(color: color),
-      headline1:  TextStyle(color: color),
-      headline2:  TextStyle(color: color),
-      headline3:  TextStyle(color: color),
-      headline4:  TextStyle(color: color),
-      headline5:  TextStyle(color: color),
-      headline6:  TextStyle(color: color),
-      subtitle1:  TextStyle(color: color),
-      subtitle2:  TextStyle(color: color),
+      headline1: TextStyle(color: color),
+      headline2: TextStyle(color: color),
+      headline3: TextStyle(color: color),
+      headline4: TextStyle(color: color),
+      headline5: TextStyle(color: color),
+      headline6: TextStyle(color: color),
+      subtitle1: TextStyle(color: Colors.black54),
+      subtitle2: TextStyle(color: color),
       button: TextStyle(color: color),
     );
   }

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/data/httpResponse.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:humpty_tyokin/costomWidget/customTextField.dart';
+import 'package:humpty_tyokin/data/httpResponse.dart';
 import 'package:humpty_tyokin/signUp/InitialGoal.dart';
-import 'package:humpty_tyokin/apiResults.dart';
 
 class InitialSetting extends StatefulWidget {
   @override
@@ -43,13 +41,11 @@ class _InitialSettingState extends State<InitialSetting> {
     });
     _passfocusNode.addListener(() {
       if (_passfocusNode.hasFocus) {
-        print('フォーカスした');
         setState(() {
           nonShow = 0;
           nonMargin = 1;
         });
       } else {
-        print('フォーカスが外れた');
         setState(() {
           nonShow = 1;
           nonMargin = 0;
@@ -178,15 +174,11 @@ class _InitialSettingState extends State<InitialSetting> {
                         setState(() => errorMsg1 = "");
                         setState(() => errorMsg2 = "");
                         if(!RegExp(r'^[0-9a-zA-Zぁ-んァ-ヴ]{1,20}$').hasMatch(nameController.text)){
-                          // print(nameController);
                           setState(() => errorMsg1 = "名前は半角英数,全角ひらがなカタカナ20字までです。");
-                          print(errorMsg1);
                           flg = false;
                         }
                         if(!RegExp(r'^[0-9a-zA-Z]{6}$').hasMatch(passController.text)){
-                          // print(passController);
                           setState(() => errorMsg2 = "パスワードは半角英数6字です。");
-                          print(errorMsg2);
                           flg = false;
                         }
                         /** OKだったら登録して次へ */

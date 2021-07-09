@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:humpty_tyokin/costomWidget/customTextField.dart';
 import 'package:humpty_tyokin/data/httpResponse.dart';
 import 'package:humpty_tyokin/data/sqlite.dart';
 
+// ignore: must_be_immutable
 class SettingAccount extends StatefulWidget {
   String myname;
   int goal;
@@ -35,7 +37,7 @@ class _SettingAccountState extends State<SettingAccount> {
     super.initState();
     /** 今の名前と目標金額をセット */
     nameController = TextEditingController(text: widget.myname);
-    goalController = TextEditingController(text: widget.goal.toString());
+    goalController = TextEditingController(text: widget.goal == 0 ? "" : widget.goal.toString());
     /** キーボードが出た時の処理を書く */
     _namefocusNode.addListener(() {
       if (_namefocusNode.hasFocus) {
@@ -73,7 +75,6 @@ class _SettingAccountState extends State<SettingAccount> {
 
   @override
   Widget build(BuildContext context) {
-    double deviceHeight;
     double deviceWidth;
     double textFieldHeight = 150;
 
@@ -86,7 +87,6 @@ class _SettingAccountState extends State<SettingAccount> {
       ),
       /******************************************************* AppBar*/
       body: LayoutBuilder(builder: (context, constraints) {
-        deviceHeight = constraints.maxHeight;
         deviceWidth = constraints.maxWidth;
 
         return GestureDetector(
@@ -100,7 +100,7 @@ class _SettingAccountState extends State<SettingAccount> {
                   alignment: Alignment.bottomCenter,
                   child: Text(
                     "アカウント設定",
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.black54),
                   ),
                 ),
                 Container(
@@ -160,14 +160,16 @@ class _SettingAccountState extends State<SettingAccount> {
                       setState(() => errorMsg1 = "");
                       setState(() => errorMsg2 = "");
                       if(!RegExp(r'^[0-9a-zA-Zぁ-んァ-ヴ]{1,20}$').hasMatch(nameController.text)){
-                        // print(nameController);
                         setState(() => errorMsg1 = "名前は半角英数,全角ひらがなカタカナ20字までです。");
                         flg = false;
                       }
                       if(!RegExp(r'^\d+$').hasMatch(goalController.text)){
-                        // print(goalController);
-                        setState(() => errorMsg2 = "数字だけを入力してください。");
-                        flg = false;
+                        if (goalController.text == "") {
+                          flg = true;
+                        }else{
+                          setState(() => errorMsg2 = "数字だけを入力してください。");
+                          flg = false;
+                        }
                       }
                       /** OKだったら登録して次へ */
                       if(flg){
@@ -175,7 +177,9 @@ class _SettingAccountState extends State<SettingAccount> {
                           /** 前と違うものなら修正 */
                           await HttpRes.chengeName(nameController.text);
                         }
-                        if(widget.goal == 0){
+                        if (goalController.text == "") {
+
+                        }else if(widget.goal == 0 && int.parse(goalController.text) > 0){
                           /** 未設定なら追加 */
                           Goal _goal = Goal(goal: int.parse(goalController.text),);
                           await SQLite.insertGoal(_goal);
