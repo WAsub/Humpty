@@ -210,12 +210,13 @@ class SQLite {
     for (int i = 0; i < maps.length; i++) {
       list.add(Goal(
         entryDate: DateTime.parse(maps[i]['entryDate']),
-        achieveDate: maps[0]['achieveDate'] == null ? null : DateTime.parse(maps[0]['achieveDate']),
+        achieveDate: maps[i]['achieveDate'] == null ? null : DateTime.parse(maps[i]['achieveDate']),
         goal: maps[i]['goal'],
         memo: maps[i]['memo'],
         flg: maps[i]['flg'] != 0 ? true : false,
       ));
     }
+    print("Goals:$list");
     return list;
   }
 
@@ -244,6 +245,7 @@ class SQLite {
             memo: maps[0]['memo'],
             flg: maps[0]['flg'] != 0 ? true : false,
           );
+          print("maxGoal:$maxGoal");
     return maxGoal;
   }
   /** 今の目標取得(日付順にIDふっているのでIDの最大値の行) */
@@ -253,6 +255,7 @@ class SQLite {
     maps = await db.rawQuery('SELECT MAX(id) FROM goals');
     int maxGoalId;
     maxGoalId = maps.isEmpty ? null : maps[0]['MAX(id)'];
+    print("maxGoalId:$maxGoalId");
     return maxGoalId;
   }
   /** 目標登録用 */
@@ -274,7 +277,7 @@ class SQLite {
     int nowID = await getGoalNowId();
     final Database db = await database;
     // リストを順番に登録
-    await db.rawInsert(
+    await db.rawUpdate(
       'UPDATE goals SET goal = ? WHERE id = ?', 
       [money, nowID]
     );
@@ -286,7 +289,7 @@ class SQLite {
     DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
     final Database db = await database;
     // リストを順番に登録
-    await db.rawInsert(
+    await db.rawUpdate(
       'UPDATE goals SET flg = ?, achieveDate = ? WHERE id = ?', 
       [flg, format.format(now), nowID]
     );

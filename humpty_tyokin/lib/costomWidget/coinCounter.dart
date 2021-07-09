@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 import 'package:humpty_tyokin/data/sqlite.dart';
 
+// ignore: must_be_immutable
 class CoinCounter extends StatelessWidget{
   List<Thokin> thokinData = [];
   Color color = Colors.blue;

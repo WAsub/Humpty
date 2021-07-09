@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:humpty_tyokin/costomWidget/swipeContainer.dart';
 import 'package:humpty_tyokin/data/sqlite.dart';
+// ignore: must_be_immutable
 class WeeklyThokin extends StatefulWidget {
   double height;
   double width;

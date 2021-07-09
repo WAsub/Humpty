@@ -23,7 +23,6 @@ class _GoalHistoryState extends State<GoalHistory> {
   Future<void> loading() async {
     /** 更新終わるまでグルグルを出しとく */
     setState(() => cpi = CircularProgressIndicator());
-    await new Future.delayed(new Duration(milliseconds: 3000));
     /** データを取得 */
     List<Goal> getlist = await SQLite.getGoal();
     /** データをセット */
@@ -57,7 +56,7 @@ class _GoalHistoryState extends State<GoalHistory> {
                   alignment: Alignment.bottomCenter,
                   child: Text(
                     "目標達成履歴",
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.black54),
                   ),
                 ),
                 Container(

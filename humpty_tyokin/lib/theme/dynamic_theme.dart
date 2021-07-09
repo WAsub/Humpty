@@ -35,6 +35,7 @@ class DynamicThemeState extends State<DynamicTheme> {
 
   ThemeType _themeType;
 
+  // ignore: unused_field
   bool _shouldLoadThemeTypes;
 
   static const String _themeTypeKey = 'theme_type';

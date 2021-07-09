@@ -127,7 +127,7 @@ class _InitialGoalState extends State<InitialGoal> {
                         minWidth: 140,
                         child: Text(
                           '貯めていく',
-                          style: TextStyle(color: Color(0xff85b103)),
+                          style: TextStyle(color: Theme.of(context).accentColor),
                         ),
                         color: Colors.white,
                         shape: StadiumBorder(),
@@ -136,11 +136,12 @@ class _InitialGoalState extends State<InitialGoal> {
                           setState(() => errorMsg = "");
                           /** 数字なら通す */
                           if (RegExp(r'^\d+$').hasMatch(goalController.text)) {
-                            print(goalController);
-                            /** ローカルに保存 */
-                            Goal _goal = Goal(goal: int.parse(goalController.text),);
-                            await SQLite.insertGoal(_goal);
-                            HttpRes.remoteGoalsUpdate();
+                            if(int.parse(goalController.text) > 0){
+                              /** ローカルに保存 */
+                              Goal _goal = Goal(goal: int.parse(goalController.text),);
+                              await SQLite.insertGoal(_goal);
+                              HttpRes.remoteGoalsUpdate();
+                            }
                             flg = true;
                           } else {
                             setState(() => errorMsg = "数字だけを入力してください。\n(何も入力しない場合はスキップします)");
