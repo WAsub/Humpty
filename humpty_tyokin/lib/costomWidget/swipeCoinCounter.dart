@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'package:humpty_tyokin/costomWidget/coinCounter.dart';
 import 'package:humpty_tyokin/data/sqlite.dart';
-
-import 'coinCounter.dart';
-
 
 class SwipeCoinCounter extends StatefulWidget{
   double height;

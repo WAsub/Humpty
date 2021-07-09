@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_theme.dart';
-import 'theme_type.dart';
 import 'color.dart';
+import 'theme_type.dart';
 
 typedef Widget ThemedWidgetBuilder(BuildContext context, ThemeData data);
 

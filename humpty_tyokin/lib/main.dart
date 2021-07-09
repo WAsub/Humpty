@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/data/httpResponse.dart';
-import 'package:humpty_tyokin/goalHistory.dart';
-import 'package:humpty_tyokin/settingAccount.dart';
 import 'dart:async';
-import 'data/sqlite.dart';
 import 'package:async/async.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
-import 'package:humpty_tyokin/theme/dynamic_theme.dart';
 import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
 import 'package:humpty_tyokin/costomWidget/customParameter.dart';
 import 'package:humpty_tyokin/costomWidget/swipeCoinCounter.dart';
-import 'package:humpty_tyokin/weeklyThokin.dart';
+import 'package:humpty_tyokin/data/httpResponse.dart';
+import 'package:humpty_tyokin/data/sqlite.dart';
 import 'package:humpty_tyokin/signUp/createAccount.dart';
+import 'package:humpty_tyokin/theme/dynamic_theme.dart';
+import 'package:humpty_tyokin/goalHistory.dart';
+import 'package:humpty_tyokin/settingAccount.dart';
+import 'package:humpty_tyokin/weeklyThokin.dart';
 
 void main() => runApp(MyApp());
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
 import 'package:intl/intl.dart';
+
+import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
 
 class CotsumiGoalCard extends StatelessWidget {
   DateTime entryDate;
