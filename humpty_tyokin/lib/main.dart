@@ -176,7 +176,7 @@ class _CotsumiState extends State<Cotsumi> {
     List<Widget> leadingIcon = [
       Image.asset('images/cotsumirogoTrim.png',width: 40,),
       Icon(CotsumiIcons.osiraseicon, color: Theme.of(context).primaryColor,),
-      Icon(Icons.account_circle_sharp, color: Theme.of(context).primaryColor,),
+      Icon(CotsumiIcons.accounticon, color: Theme.of(context).primaryColor,),
       Icon(CotsumiIcons.group, color: Theme.of(context).primaryColor,),
     ];
     List<Widget> titleText = [

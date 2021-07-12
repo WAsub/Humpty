@@ -7,9 +7,23 @@
   "ascent": 850,
   "glyphs": [
     {
-      "uid": "c3713278660b382611ee78474fa2629f",
+      "uid": "00a00e379bd30100c0e2d41d3787ff4d",
+      "css": "accounticon",
+      "code": 59400,
+      "src": "custom_icons",
+      "selected": true,
+      "svg": {
+        "path": "M500 551.8C652.3 551.8 775.8 428.4 775.8 276 775.8 123.7 652.3 0.2 500 0.2 347.7 0.2 224.2 123.7 224.2 276 224.2 428.4 347.7 551.8 500 551.8ZM983.9 914.5C925.4 734.8 711 637 500 637 289 637 74.6 734.8 16.1 914.5 6.7 943.3 1.6 971.9 0 999.8H1000C998.4 971.9 993.3 943.3 983.9 914.5Z",
+        "width": 1000
+      },
+      "search": [
+        "accounticon"
+      ]
+    },
+    {
+      "uid": "2c7a8ecceacd29496d9a542064d414d4",
       "css": "check",
-      "code": 59392,
+      "code": 59401,
       "src": "custom_icons",
       "selected": true,
       "svg": {
@@ -21,9 +35,9 @@
       ]
     },
     {
-      "uid": "4b6d25dbedf6b120a9f85c6542bd8399",
+      "uid": "1ca5a495f5c01e602b595edd5fcb50c4",
       "css": "coinsuuicon",
-      "code": 59393,
+      "code": 59402,
       "src": "custom_icons",
       "selected": true,
       "svg": {
@@ -35,9 +49,9 @@
       ]
     },
     {
-      "uid": "d98a03112b89ea111029c0deaff8c468",
+      "uid": "9d728552565fa87b76d878e9c924d9f4",
       "css": "dollicon",
-      "code": 59394,
+      "code": 59403,
       "src": "custom_icons",
       "selected": true,
       "svg": {
@@ -49,9 +63,9 @@
       ]
     },
     {
-      "uid": "188d8a55fe636d3c35c8ce91a42a83d6",
+      "uid": "aad530108f309ebc56d1f96b95f28df2",
       "css": "genzaidakaicon",
-      "code": 59395,
+      "code": 59404,
       "src": "custom_icons",
       "selected": true,
       "svg": {
@@ -63,9 +77,9 @@
       ]
     },
     {
-      "uid": "cebe6f8ad012e4b7ec329eb467e31281",
+      "uid": "438b3364a3ac0d7a277b2db09f5781d4",
       "css": "group",
-      "code": 59396,
+      "code": 59405,
       "src": "custom_icons",
       "selected": true,
       "svg": {
@@ -77,9 +91,9 @@
       ]
     },
     {
-      "uid": "9909f2fc879d8f1f2f013c611d662984",
+      "uid": "89cf1c97a31a1c8ea9fc35182d89e9b9",
       "css": "osiraseicon",
-      "code": 59397,
+      "code": 59406,
       "src": "custom_icons",
       "selected": true,
       "svg": {
@@ -88,34 +102,6 @@
       },
       "search": [
         "osiraseicon"
-      ]
-    },
-    {
-      "uid": "64d11bb33916c8725138d94f3b2efc3f",
-      "css": "ribon",
-      "code": 59398,
-      "src": "custom_icons",
-      "selected": true,
-      "svg": {
-        "path": "M0 3.3L339.3 3.3 339.3 353.8 0 3.3ZM2.3 731.5L353.5 381 355.9 731.5 2.3 731.5ZM5166.7 734.8L4827.4 734.8 4827.4 384.3 5166.7 734.8ZM5164.3 6.6L4813.2 357.1 4810.8 6.6 5164.3 6.6Z",
-        "width": 5167
-      },
-      "search": [
-        "ribon"
-      ]
-    },
-    {
-      "uid": "9139383459a6347a3e58f02af05fc115",
-      "css": "tasseirirekiicon",
-      "code": 59399,
-      "src": "custom_icons",
-      "selected": true,
-      "svg": {
-        "path": "M278 31.3C539 79.5 531 208 747.8 191.9 820.1 191.9 894.3 153.6 908.5 167.8 920.5 179.9 828.2 416.8 667.5 485.1 536.5 540.7 362.3 545.3 278 489.1V31.3ZM153 1000C118.4 1000 90.5 972 90.5 937.5V62.5C90.5 28 118.4 0 153 0 187.5 0 215.5 28 215.5 62.5V937.5C215.5 972 187.5 1000 153 1000Z",
-        "width": 1000
-      },
-      "search": [
-        "tasseirirekiicon"
       ]
     }
   ]
