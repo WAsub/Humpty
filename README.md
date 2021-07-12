@@ -7,6 +7,9 @@
   2021/06/17現在  
   ワイヤーフレームをもとに画面の作成。  
   HTTP通信にてサーバーからデータを引き出し表示させることは成功。
+  2021/07/12現在
+  ほぼ完成。
+  あとはサーバーとAPI完成後に瑕疵がないか確認と調整をするだけ。
 ***
 ## テスト用
 ### [humpty_sumple_gesturedetector](https://github.com/WAsub/Humpty/edit/main/humpty_sumple_gesturedetector)
