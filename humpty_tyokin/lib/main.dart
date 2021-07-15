@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:async/async.dart';
-import 'package:humpty_tyokin/achieveDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
@@ -12,11 +12,20 @@ import 'package:humpty_tyokin/data/httpResponse.dart';
 import 'package:humpty_tyokin/data/sqlite.dart';
 import 'package:humpty_tyokin/signUp/createAccount.dart';
 import 'package:humpty_tyokin/theme/dynamic_theme.dart';
+import 'package:humpty_tyokin/achieveDialog.dart';
 import 'package:humpty_tyokin/goalHistory.dart';
 import 'package:humpty_tyokin/settingAccount.dart';
 import 'package:humpty_tyokin/weeklyThokin.dart';
 
-void main() => runApp(MyApp());
+void main(){
+  WidgetsFlutterBinding.ensureInitialized();
+  //向き指定
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,//縦固定
+  ]);
+  //runApp
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override

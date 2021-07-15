@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import 'costomWidget/customTextField.dart';
 import 'theme/dynamic_theme.dart';
 
-void main() {
+void main(){
+  WidgetsFlutterBinding.ensureInitialized();
+  //向き指定
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,//横固定
+  ]);
+  //runApp
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -28,35 +37,61 @@ class CotsumiDisplay extends StatefulWidget {
 }
 
 class _CotsumiDisplayState extends State<CotsumiDisplay> {
+  double deviceHeight;
+  double deviceWidth;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(child: Text("残高"),),
-          Container(child: TextField(),),
-          Container(
-            child: Row(children: [
-              FlatButton(
-                  height: 29.124,
-                  minWidth: 100,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 空白がなくなる
-                  child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    
-                    Text(
-                      "現在高",
-                    ),
-                  ]),
-                  shape: StadiumBorder(),
-                  onPressed: () {
-                    
+      body:  LayoutBuilder(builder: (context, constraints) {
+        deviceHeight = constraints.maxHeight;
+        deviceWidth = constraints.maxWidth;
+
+        return Column(
+          children: [
+            Container(
+              color: Colors.yellowAccent,
+              alignment: Alignment.bottomCenter,
+              height: deviceHeight * 0.2,
+              child: Text("残高"),
+            ),
+            Container(
+              alignment: Alignment.center,
+              color: Colors.amber,
+              height: deviceHeight * 0.4,
+              child: CustomTextField(
+                width: deviceWidth * 0.85,
+                height: 50,
+                labelText: "ニックネーム",
+                // focusNode: _namefocusNode,
+                // controller: nameController,
+                keyboardType: TextInputType.number,
+              ),
+            ),
+            Container(
+              color: Colors.yellow,
+              height: deviceHeight * 0.4,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    child: Text("入金",),
+                    onPressed: () {
                     }
-                    )
-                  
-            ],),
-          )
-        ],
-      ),
+                  ),
+                  TextButton(
+                    child: Text("出金",),
+                    onPressed: () {
+                    }
+                  )  
+                ],
+              ),
+            )
+          ],
+        );
+
+      })
     );
   }
 }

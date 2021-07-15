@@ -10,14 +10,23 @@ class AppTheme {
       selectedRowColor: MyColor.basic[3],
       focusColor: MyColor.basic[2],
       brightness: Brightness.light, 
-      colorScheme: scheme_basic(),
-      textTheme: text_basic(MyColor.basic[2]),
-      primaryTextTheme: text_basic(Colors.white),
-      accentTextTheme: text_basic(Colors.white),
+      // colorScheme: scheme_basic(),
+      textTheme: text_basic(Colors.black87),
+      // primaryTextTheme: text_basic(Colors.white),
+      // accentTextTheme: text_basic(Colors.white),
+      textButtonTheme: TextButtonThemeData (
+        style: ButtonStyle(
+          alignment: Alignment.center,
+          fixedSize: MaterialStateProperty.all(Size(241.4,100)),
+          backgroundColor: MaterialStateProperty.all(MyColor.basic[2]),
+          foregroundColor: MaterialStateProperty.all(Colors.white),
+          textStyle: MaterialStateProperty.all(TextStyle(fontSize: 57.73))
+        )
+      ),
       iconTheme: icon_basic(),
       primaryIconTheme: icon_basic(),
       accentIconTheme: icon_basic(),
-      textSelectionTheme: TextSelectionThemeData(cursorColor: MyColor.basic[2]),
+      // textSelectionTheme: TextSelectionThemeData(cursorColor: MyColor.basic[2]),
     );
   }
   static ColorScheme scheme_basic(){
@@ -39,8 +48,8 @@ class AppTheme {
   }
   static TextTheme text_basic(color){
     return TextTheme(
-      bodyText1: TextStyle(color: color),
-      bodyText2: TextStyle(color: color),
+      bodyText1: TextStyle(color: color,),
+      bodyText2: TextStyle(color: color, fontSize: 41.425),
       headline1: TextStyle(color: color),
       headline2: TextStyle(color: color),
       headline3: TextStyle(color: color),
