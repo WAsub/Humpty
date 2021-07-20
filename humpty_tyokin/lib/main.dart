@@ -316,7 +316,16 @@ class _CotsumiState extends State<Cotsumi> {
                 alignment: Alignment.center,
                 child: Stack(alignment: AlignmentDirectional.center, children: [
                   /** 貯金額と目標達成率 */
-                  CustomParameter(current: total, currentColor: Theme.of(context).accentColor, goal: goal, goalColor: Theme.of(context).primaryColor, color: Theme.of(context).accentColor, backcolor: Theme.of(context).primaryColor, strokeWidth: 26, height: deviceWidth * 0.8, width: deviceWidth * 0.8),
+                  CustomParameter(
+                    current: total, 
+                    currentColor: Theme.of(context).accentColor, 
+                    goal: goal, 
+                    goalColor: Theme.of(context).primaryColor, 
+                    color: Theme.of(context).accentColor, 
+                    backcolor: Theme.of(context).primaryColor, 
+                    strokeWidth: 26, height: deviceWidth * 0.8, 
+                    width: deviceWidth * 0.8
+                  ),
                   /** 硬貨の枚数 */
                   SwipeCoinCounter(
                     swipL: swip,

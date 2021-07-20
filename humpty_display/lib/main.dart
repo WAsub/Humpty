@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'costomWidget/customTextField.dart';
 import 'theme/dynamic_theme.dart';
+import 'withdrawal/withdrawal.dart';
 
 void main(){
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,48 +48,57 @@ class _CotsumiDisplayState extends State<CotsumiDisplay> {
         deviceHeight = constraints.maxHeight;
         deviceWidth = constraints.maxWidth;
 
-        return Column(
-          children: [
-            Container(
-              color: Colors.yellowAccent,
-              alignment: Alignment.bottomCenter,
-              height: deviceHeight * 0.2,
-              child: Text("残高"),
-            ),
-            Container(
-              alignment: Alignment.center,
-              color: Colors.amber,
-              height: deviceHeight * 0.4,
-              child: CustomTextField(
-                width: deviceWidth * 0.85,
-                height: 50,
-                labelText: "ニックネーム",
-                // focusNode: _namefocusNode,
-                // controller: nameController,
-                keyboardType: TextInputType.number,
-              ),
-            ),
-            Container(
-              color: Colors.yellow,
-              height: deviceHeight * 0.4,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TextButton(
-                    child: Text("入金",),
-                    onPressed: () {
-                    }
+        return Container(
+          color: Colors.white,
+            child: Column(children: [
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  height: deviceHeight * 0.2,
+                  child: Text("残高"),
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  height: deviceHeight * 0.4,
+                  child: Container(
+                    width: deviceWidth * 0.5,
+                    height: deviceHeight * 0.4 * 0.5,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border(bottom: BorderSide(width: 2.5))
+                    ),
+                    child: Stack(children: [
+                      Container(alignment: Alignment.bottomLeft, child: Text("¥", style: TextStyle(fontSize: 57.73),),),
+                      Container(alignment: Alignment.bottomRight, child: Text("1000", style: TextStyle(fontSize: 57.73),),)
+                    ],),
+                  )
+                ),
+                Container(
+                  height: deviceHeight * 0.4,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        child: Text("入金",),
+                        onPressed: () {
+                          
+                        }
+                      ),
+                      TextButton(
+                        child: Text("出金",),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) {
+                              // ログイン画面へ
+                              return Withdrawal();
+                            }),
+                          );
+                        }
+                      )  
+                    ],
                   ),
-                  TextButton(
-                    child: Text("出金",),
-                    onPressed: () {
-                    }
-                  )  
-                ],
-              ),
-            )
-          ],
+                )
+            ],),
         );
 
       })
