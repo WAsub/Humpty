@@ -72,7 +72,7 @@ class Goal {
 
   @override
   String toString() {
-    return 'Thokin{userId: $userId, entryDate: $entryDate, achieveDate: $achieveDate, goal: $goal, memo: $memo, flg: $flg}';
+    return 'Goal{userId: $userId, entryDate: $entryDate, achieveDate: $achieveDate, goal: $goal, memo: $memo, flg: $flg}';
   }
 }
 
@@ -245,7 +245,7 @@ class SQLite {
             memo: maps[0]['memo'],
             flg: maps[0]['flg'] != 0 ? true : false,
           );
-          print("maxGoal:$maxGoal");
+          // print("maxGoal:$maxGoal");
     return maxGoal;
   }
   /** 今の目標取得(日付順にIDふっているのでIDの最大値の行) */

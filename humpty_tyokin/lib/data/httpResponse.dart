@@ -14,7 +14,7 @@ class DataRequest {
 }
 /** リモートデータベースの目標リスト更新用 */
 class GoalUpdateRequest {
-  final List<Goal> goallist;
+  final List<Map<String, dynamic>> goallist;
   GoalUpdateRequest({
     this.goallist,
   });
@@ -47,15 +47,21 @@ class ChengeNameRequest {
 }
 /** HTTP通信系まとめ */
 class HttpRes{
+  /** 貯金データ取得 */
   static Future<void> getThokinData() async {
     /** HTTP通信 */
     ApiResults httpRes;
+    /** ユーザーIDを引き出して */
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String myId = (prefs.getString('myid') ?? "");
+    print(DataRequest(userid: myId).toJson());
     /** サーバーからデータを取得 */
     httpRes = await fetchApiResults(
       "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-      /// new DataRequest(userid: _loginData[0]).toJson()
-      new DataRequest(userid: "abc").toJson() // TODO　テスト用
+      new DataRequest(userid: myId).toJson()
     );
+    print(httpRes.message);
+    print(httpRes.data);
     /** データを取得できたらローカルのデータを入れ替え */
     if (httpRes.message != "Failed") {
       List<Thokin> thokin = [];
@@ -83,42 +89,47 @@ class HttpRes{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String myId = (prefs.getString('myid') ?? "");
     /** 目標リスト引き出してIDを穴埋め */
+    List<Map<String, dynamic>> glist = [];
     List<Goal> list = await SQLite.getGoal();
     for(int i = 0; i < list.length; i++){
       list[i].userId = myId;
+      glist.add(list[i].toMap());
     }
-    print(GoalUpdateRequest(goallist: list).toJson());
-    // TODO API完成まではここの処理はコメントアウト
+    print(GoalUpdateRequest(goallist: glist).toJson());
     /** サーバーへ登録 */
-    // bool flg = false;
-    // while (!flg) {
-    //   /** サーバーへデータを送信 */
-    //   httpRes = await fetchApiResults(
-    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-    //     new GoalUpdateRequest(goallist: list).toJson()
-    //   );
-    //   /** 成功したら端末に保存 */
-    //   if(httpRes.message != "Failed"){
-    //     flg = true;
-    //   }
-    // }
+    bool flg = false;
+    while (!flg) {
+      /** サーバーへデータを送信 */
+      httpRes = await fetchApiResults(
+        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        new GoalUpdateRequest(goallist: glist).toJson()
+      );
+      print(httpRes.message);
+      print(httpRes.data);
+      /** 成功したら端末に保存 */
+      if(httpRes.message != "Failed"){
+        flg = true;
+      }
+      flg = true; // TODO テスト用
+    }
   }
   /** アカウント作成 */
   static Future<void> signUp(String name, String pass) async {
     /** HTTP通信 */
     ApiResults httpRes;
+    print(SignUpRequest(username: name, userpass: pass).toJson());
     bool flg = false;
-    // while (!flg) {
-    //   // TODO API完成まではここの処理はコメントアウト
-    //   /** サーバーへデータを送信 */
-    //   httpRes = await fetchApiResults(
-    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-    //     new SignUpRequest(username: name, userpass: pass).toJson()
-    //   );
-    //   /** 成功したら端末に保存 */
-    //   if(httpRes.message != "Failed"){
-    //     String myid = httpRes.data["userid"];
-        String myid = "abc"; // TODO テスト用
+    while (!flg) {
+      /** サーバーへデータを送信 */
+      httpRes = await fetchApiResults(
+        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        new SignUpRequest(username: name, userpass: pass).toJson()
+      );
+      print(httpRes.message);
+      print(httpRes.data);
+      /** 成功したら端末に保存 */
+      if(httpRes.message != "Failed"){
+        String myid = httpRes.data["userid"];
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString("myid", myid);
         await prefs.setString("myname", name);
@@ -126,27 +137,44 @@ class HttpRes{
         await prefs.setBool("first", true);
         await prefs.setBool("login", true);
         flg = true;
-      // }
-    // }
+      }
+      // TODO テスト用
+      String myid = "abc"; 
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("myid", myid);
+      await prefs.setString("myname", name);
+      await prefs.setString("mypass", pass);
+      await prefs.setBool("first", true);
+      await prefs.setBool("login", true);
+      flg = true;
+      // TODO テスト用
+    }
   }
   /** ニックネーム変更用 */
   static Future<void> chengeName(String name) async {
     /** HTTP通信 */
     ApiResults httpRes;
+    print(ChengeNameRequest(username: name,).toJson());
     bool flg = false;
-    // while (!flg) {
-    //   // TODO API完成まではここの処理はコメントアウト
-    //   /** サーバーへデータを送信 */
-    //   httpRes = await fetchApiResults(
-    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-    //     new ChengeNameRequest(username: name,).toJson()
-    //   );
-    //   /** 成功したら端末に保存 */
-    //   if(httpRes.message != "Failed"){
+    while (!flg) {
+      /** サーバーへデータを送信 */
+      httpRes = await fetchApiResults(
+        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        new ChengeNameRequest(username: name,).toJson()
+      );
+      print(httpRes.message);
+      print(httpRes.data);
+      /** 成功したら端末に保存 */
+      if(httpRes.message != "Failed"){
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString("myname", name);
         flg = true;
-    //   }
-    // }
+      }
+      // TODO テスト用
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("myname", name);
+      flg = true;
+      // TODO テスト用
+    }
   }
 }
