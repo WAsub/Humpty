@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'apiResults.dart';
@@ -13,50 +14,52 @@ class DataRequest {
     'userid': userid,
   };
 }
-/** リモートデータベースの目標リスト更新用 */
-class GoalUpdateRequest {
-  final List<Goal> goallist;
-  GoalUpdateRequest({
-    this.goallist,
+/** 出金額送信用 */
+class WithdrawMoneyRequest {
+  final Thokin money;
+  WithdrawMoneyRequest({
+    this.money,
   });
   Map<String, dynamic> toJson() => {
-    'goallist': goallist,
+    'withdrawMoney': money.toMap(),
   };
 }
-/** アカウント作成用 */
-class SignUpRequest {
-  final String username;
-  final String userpass;
-  SignUpRequest({
-    this.username,
-    this.userpass,
+/** 入金処理開始フラグ送信 */
+class DepositFlgRequest{
+  final DateTime date;
+  final bool flg;
+  DepositFlgRequest({
+    this.date,
+    this.flg,
   });
   Map<String, dynamic> toJson() => {
-    'username': username,
-    'userpass': userpass,
+    'date': date,
+    'flg': flg,
   };
 }
-/** ニックネーム変更用 */
-class ChengeNameRequest {
-  final String username;
-  ChengeNameRequest({
-    this.username,
+/** 入金額取得用 */
+class DepositMoneyRequest{
+  final bool flg;
+  DepositMoneyRequest({
+    this.flg,
   });
   Map<String, dynamic> toJson() => {
-    'username': username,
+    'flg': flg,
   };
 }
 /** HTTP通信系まとめ */
 class HttpRes{
-  static Future<void> getThokinData() async {
+  static Future<void> getThokinData(String id) async {
     /** HTTP通信 */
     ApiResults httpRes;
+    print(DataRequest(userid: id).toJson());
     /** サーバーからデータを取得 */
     httpRes = await fetchApiResults(
       "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-      /// new DataRequest(userid: _loginData[0]).toJson()
-      new DataRequest(userid: "abc").toJson() // TODO　テスト用
+      new DataRequest(userid: id).toJson()
     );
+    print(httpRes.message);
+    print(httpRes.data);
     /** データを取得できたらローカルのデータを入れ替え */
     if (httpRes.message != "Failed") {
       List<Thokin> thokin = [];
@@ -76,78 +79,74 @@ class HttpRes{
       await SQLite.insertThokin(thokin);
     }
   }
-  /** リモートデータベースの目標リスト更新 */
-  static Future<void> remoteGoalsUpdate() async {
+  /** 出金額送信 */
+  static Future<void> sendWithdrawMoney(Map<int,int> data) async {
     /** HTTP通信 */
     ApiResults httpRes;
-    /** ユーザーIDを引き出して */
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String myId = (prefs.getString('myid') ?? "");
-    /** 目標リスト引き出してIDを穴埋め */
-    List<Goal> list = await SQLite.getGoal();
-    for(int i = 0; i < list.length; i++){
-      list[i].userId = myId;
+    /** Thokinに入れ替え */
+    DateTime now = DateTime.now();
+    final Thokin money = Thokin(
+      date: now,
+      five_hundred_yen: data[500],
+      hundred_yen: data[100],
+      fifty_yen: data[50],
+      ten_yen: data[10],
+      five_yen: data[5],
+      one_yen: data[1]
+    );
+    print(WithdrawMoneyRequest(money: money).toJson());
+    /** サーバーへ送信 */
+    bool flg = false;
+    while (!flg) {
+      httpRes = await fetchApiResults(
+        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        new WithdrawMoneyRequest(money: money).toJson()
+      );
+      print(httpRes.message);
+      print(httpRes.data);
+      if (httpRes.message != "Failed") {
+        flg = true;
+      }
+      flg = true; // TODO テスト用
     }
-    // print(list);
-    // TODO API完成まではここの処理はコメントアウト
-    /** サーバーへ登録 */
-    // bool flg = false;
-    // while (!flg) {
-    //   /** サーバーへデータを送信 */
-    //   httpRes = await fetchApiResults(
-    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-    //     new GoalUpdateRequest(goallist: list).toJson()
-    //   );
-    //   /** 成功したら端末に保存 */
-    //   if(httpRes.message != "Failed"){
-    //     flg = true;
-    //   }
-    // }
   }
-  /** アカウント作成 */
-  static Future<void> signUp(String name, String pass) async {
+  /** 入金処理開始フラグ送信 */
+  static Future<void> sendDepositFlg(bool sendflg) async {
     /** HTTP通信 */
     ApiResults httpRes;
+    /** Thokinに入れ替え */
+    DateTime now = DateTime.now();
+    print(DepositFlgRequest(date: now, flg: sendflg).toJson());
+    /** サーバーへ送信 */
     bool flg = false;
-    // while (!flg) {
-    //   // TODO API完成まではここの処理はコメントアウト
-    //   /** サーバーへデータを送信 */
-    //   httpRes = await fetchApiResults(
-    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-    //     new SignUpRequest(username: name, userpass: pass).toJson()
-    //   );
-    //   /** 成功したら端末に保存 */
-    //   if(httpRes.message != "Failed"){
-    //     String myid = httpRes.data["userid"];
-        String myid = "abc"; // TODO テスト用
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("myid", myid);
-        await prefs.setString("myname", name);
-        await prefs.setString("mypass", pass);
-        await prefs.setBool("first", true);
-        await prefs.setBool("login", true);
+    while (!flg) {
+      httpRes = await fetchApiResults(
+        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        new DepositFlgRequest(date: now, flg: true).toJson()
+      );
+      print(httpRes.message);
+      print(httpRes.data);
+      if (httpRes.message != "Failed") {
         flg = true;
-      // }
-    // }
+      }
+      flg = true; // TODO テスト用
+    }
   }
-  /** ニックネーム変更用 */
-  static Future<void> chengeName(String name) async {
+  /** 入金額取得 */
+  static Future<int> getDepositMoney() async {
     /** HTTP通信 */
     ApiResults httpRes;
-    bool flg = false;
-    // while (!flg) {
-    //   // TODO API完成まではここの処理はコメントアウト
-    //   /** サーバーへデータを送信 */
-    //   httpRes = await fetchApiResults(
-    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-    //     new ChengeNameRequest(username: name,).toJson()
-    //   );
-    //   /** 成功したら端末に保存 */
-    //   if(httpRes.message != "Failed"){
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("myname", name);
-        flg = true;
-    //   }
-    // }
+    print(DepositMoneyRequest(flg: true).toJson());
+    /** サーバーへデータを送信 */
+    httpRes = await fetchApiResults(
+      "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+      new DepositMoneyRequest(flg: true).toJson()
+    );
+    print(httpRes.message);
+    print(httpRes.data);
+    if (httpRes.message != "Failed") {
+      return httpRes.data["money"];
+    }
+    return 233; // TODO テスト用
   }
 }

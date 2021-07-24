@@ -87,7 +87,7 @@ class HttpRes{
     for(int i = 0; i < list.length; i++){
       list[i].userId = myId;
     }
-    // print(list);
+    print(GoalUpdateRequest(goallist: list).toJson());
     // TODO API完成まではここの処理はコメントアウト
     /** サーバーへ登録 */
     // bool flg = false;

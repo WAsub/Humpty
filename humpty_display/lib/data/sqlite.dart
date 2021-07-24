@@ -104,7 +104,7 @@ class SQLite {
         );
         // // テスト用
         await db.execute(
-          'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-03 15:25:07", 400, 0, 0, 0, 2, 3, 0)',
+          'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-03 15:25:07", 3330, 5, 5, 5, 5, 5, 5)',
         );
         await db.execute(
           'INSERT INTO thokin(date, money, one_yen, five_yen, ten_yen, fifty_yen, hundred_yen, five_hundred_yen) VALUES ("2021-01-03 16:20:08", -50, 0, 0, 0, -1, 0, 0)',

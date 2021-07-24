@@ -1,73 +1,107 @@
 import 'package:flutter/material.dart';
 
-class customCoinCount extends StatefulWidget {
-  int data;
+class CustomCoinCount extends StatefulWidget {
+  final double width;
+  final int data;
   int count;
-  customCoinCount({ 
-    this.data,
-    this.count,
-    Key key 
-  }) : super(key: key);
+  final int max;
+  Function(int, int) callback;
+
+  CustomCoinCount({
+    this.width,
+    this.data = 500, 
+    this.count = 0, 
+    this.max = 10, 
+    this.callback, 
+    key}) : super(key: key);
 
   @override
-  _customCoinCountState createState() => _customCoinCountState();
+  CustomCoinCountState createState() => CustomCoinCountState();
 }
 
-class _customCoinCountState extends State<customCoinCount> {
-  double widgetHeight;
+class CustomCoinCountState extends State<CustomCoinCount> {
+  // double widgetHeight;
   double widgetWidth;
   @override
   Widget build(BuildContext context) {
-    widget.data = widget.data == null ? 500 : widget.data;
-    widget.count = widget.count == null ? 0 : widget.count;
     return LayoutBuilder(builder: (context, constraints) {
-      widgetHeight = constraints.maxHeight;
-      widgetWidth = constraints.maxWidth;
+      widgetWidth = widget.width;
+      if(widget.width == null){
+        widgetWidth = constraints.maxWidth;
+      }
 
       return Container(
         alignment: Alignment.center,
         child: Container(
-          color: Colors.blue,
-          height: widgetWidth/3,
+          // color: Colors.blue,
+          height: widgetWidth / 3,
           width: widgetWidth,
-          child: Row(children: [
-            Container(
-              alignment: Alignment.center,
-              height: widgetWidth/3,
-              width: widgetWidth/2,
-              color: Theme.of(context).primaryColor,
-              child: Text(widget.data.toString(), style: TextStyle(fontSize: 29.29),),
-            ),
-            Stack(children: [
+          child: Row(
+            children: [
               Container(
                 alignment: Alignment.center,
-                height: widgetWidth/3,
-                width: widgetWidth/2,
-                color: Colors.white,
-                child: Text(widget.count.toString(), style: TextStyle(fontSize: 29.29),),
+                height: widgetWidth / 3,
+                width: widgetWidth / 2,
+                color: Theme.of(context).primaryColor,
+                child: Text(
+                  widget.data.toString(),
+                  style: TextStyle(fontSize: 29.29),
+                ),
               ),
-              Row(children: [
-                Container(
-                  alignment: Alignment.centerLeft,
-                  height: widgetWidth/3,
-                  width: widgetWidth/4,
-                  color: Colors.blueAccent.withOpacity(0.5),
-                  child: IconButton(onPressed: (){}, icon: Icon(Icons.remove_circle_outline)),
-                ),
-                Container(
-                  alignment: Alignment.centerRight,
-                  height: widgetWidth/3,
-                  width: widgetWidth/4,
-                  color: Colors.indigoAccent.withOpacity(0.5),
-                  child: IconButton(onPressed: (){}, icon: Icon(Icons.add_circle_outlined)),
-                ),
-              ],)
-            ],)
-          ],),
+              Stack(
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    height: widgetWidth / 3,
+                    width: widgetWidth / 2,
+                    color: Colors.white,
+                    child: Text(
+                      widget.count.toString(),
+                      style: TextStyle(fontSize: 29.29),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        height: widgetWidth / 3,
+                        width: widgetWidth / 4,
+                        child: IconButton(
+                          icon: Icon(Icons.remove_circle_outline, color: Theme.of(context).accentColor,),
+                          onPressed: () {
+                            setState(() {
+                              if (widget.count > 0) {
+                                widget.count--;
+                              }
+                            });
+                            widget.callback(widget.data, widget.count);
+                          },
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        height: widgetWidth / 3,
+                        width: widgetWidth / 4,
+                        child: IconButton(
+                          icon: Icon(Icons.add_circle_outlined, color: Theme.of(context).accentColor,),
+                          onPressed: () {
+                            setState(() {
+                              if (widget.count < widget.max) {
+                                widget.count++;
+                              }
+                            });
+                            widget.callback(widget.data, widget.count);
+                          },
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              )
+            ],
+          ),
         ),
       );
-      
-
     });
   }
 }
