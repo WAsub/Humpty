@@ -1,5 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="haveabook.humpty_sumple_gesturedetector">
+    <intent-filter>
+		<action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+	</intent-filter>
+
+	<meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+		android:resource="@xml/device_filter" />
    <application
         android:label="humpty_sumple_gesturedetector"
         android:icon="@mipmap/ic_launcher">

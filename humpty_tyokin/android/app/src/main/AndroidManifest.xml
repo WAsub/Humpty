@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
    <application
         android:networkSecurityConfig="@xml/network_security_config"
-        android:label="humpty_tyokin"
+        android:label="こつみ -Cotsumi-"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

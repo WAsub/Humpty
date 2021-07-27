@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:async/async.dart';
-import 'package:humpty_tyokin/achieveDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
@@ -12,11 +12,20 @@ import 'package:humpty_tyokin/data/httpResponse.dart';
 import 'package:humpty_tyokin/data/sqlite.dart';
 import 'package:humpty_tyokin/signUp/createAccount.dart';
 import 'package:humpty_tyokin/theme/dynamic_theme.dart';
+import 'package:humpty_tyokin/achieveDialog.dart';
 import 'package:humpty_tyokin/goalHistory.dart';
 import 'package:humpty_tyokin/settingAccount.dart';
 import 'package:humpty_tyokin/weeklyThokin.dart';
 
-void main() => runApp(MyApp());
+void main(){
+  WidgetsFlutterBinding.ensureInitialized();
+  //向き指定
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,//縦固定
+  ]);
+  //runApp
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -307,7 +316,16 @@ class _CotsumiState extends State<Cotsumi> {
                 alignment: Alignment.center,
                 child: Stack(alignment: AlignmentDirectional.center, children: [
                   /** 貯金額と目標達成率 */
-                  CustomParameter(current: total, currentColor: Theme.of(context).accentColor, goal: goal, goalColor: Theme.of(context).primaryColor, color: Theme.of(context).accentColor, backcolor: Theme.of(context).primaryColor, strokeWidth: 26, height: deviceWidth * 0.8, width: deviceWidth * 0.8),
+                  CustomParameter(
+                    current: total, 
+                    currentColor: Theme.of(context).accentColor, 
+                    goal: goal, 
+                    goalColor: Theme.of(context).primaryColor, 
+                    color: Theme.of(context).accentColor, 
+                    backcolor: Theme.of(context).primaryColor, 
+                    strokeWidth: 26, height: deviceWidth * 0.8, 
+                    width: deviceWidth * 0.8
+                  ),
                   /** 硬貨の枚数 */
                   SwipeCoinCounter(
                     swipL: swip,
