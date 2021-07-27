@@ -55,8 +55,6 @@ class _CotsumiState extends State<Cotsumi> {
   int goal = 0;
   /** 初期化を一回だけするためのライブラリ */
   final AsyncMemoizer memoizer = AsyncMemoizer();
-  /** 端末にデータを保存する奴 */
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   /** リロード時のぐるぐる */
   Widget cpi;
   /** コイン枚数のスワイプ用 */
@@ -90,8 +88,7 @@ class _CotsumiState extends State<Cotsumi> {
 
   /** チュートリアルを出すか判定 */
   Future<void> isFirst() async {
-    final SharedPreferences prefs = await _prefs;
-    // final int login = (prefs.getInt('MyAccount') ?? 0) + 1;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     final bool first = (prefs.getBool('first') ?? false);
     if (!first) {
       Navigator.of(context).push(
@@ -109,10 +106,10 @@ class _CotsumiState extends State<Cotsumi> {
 
   /** ログイン */
   Future<void> isLogin() async {
-    final SharedPreferences prefs = await _prefs;
-    final String myId = (prefs.getString('myid') ?? "");
-    final String myAct = (prefs.getString('myname') ?? "");
-    final String mypass = (prefs.getString('mypass') ?? "");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String myId = (prefs.getString("myid") ?? "");
+    final String myAct = (prefs.getString("myname") ?? "");
+    final String mypass = (prefs.getString("mypass") ?? "");
     if (myAct != "" && mypass != "") {
       setState(() => _loginData = [myId, myAct, mypass]);
     } else {
@@ -175,8 +172,6 @@ class _CotsumiState extends State<Cotsumi> {
     isAchieve();
     /** グルグル終わり */
     setState(() => cpi = null);
-    // print(_thokinData);
-    // print(cpi);
   }
 
   @override
