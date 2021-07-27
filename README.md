@@ -21,8 +21,16 @@
 ## テスト用
 ### [humpty_sumple_gesturedetector](https://github.com/WAsub/Humpty/edit/main/humpty_sumple_gesturedetector)
   カスタムウィジェット等を作る際に試す用のプログラム。  
-  テスト用プログラム。
-  
+  テスト用プログラム。  
+### [humpty_usb](https://github.com/WAsub/Humpty/edit/main/humpty_usb)
+  シリアル通信テスト用プログラム。(結局断念)  
+  テスト用プログラム。  
+***
 ### その他
-  メンバーと共有する資料や、githubの使い方を試した時のテスト用ファイル等。
+  メンバーと共有する資料や、githubの使い方を試した時のテスト用ファイル等。  
+### cotsumi_icon  
+### cotsumi_icon_ping  
+### cotsumi_icon_svg  
+### flutter-icons-40eab79a  
+  オリジナルアイコン及び画像関連
 ***
