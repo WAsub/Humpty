@@ -18,13 +18,23 @@ class AppTheme {
         overline:  TextStyle(fontSize: 15, color: MyColor.basic[2]),
         headline1: TextStyle(color: MyColor.basic[2]),
         headline2: TextStyle(color: MyColor.basic[2]),
-        headline3: TextStyle(color: MyColor.basic[2]),
+        headline3: TextStyle(fontSize: 14,fontFamily: "RobotoMono", fontStyle: FontStyle.italic, color: Color(0xffeaeea2)),
         headline4: TextStyle(fontSize: 30,color: MyColor.basic[2]),
-        headline5: TextStyle(color: MyColor.basic[2]),
+        headline5: TextStyle(color: Colors.white, fontSize: 16,),
         headline6: TextStyle(color: Colors.white),
-        subtitle1: TextStyle(color: Colors.redAccent, fontSize: 12),
-        subtitle2: TextStyle(color: MyColor.basic[2]),
-        button: TextStyle(color: MyColor.basic[2]),
+        subtitle1: TextStyle(color: Colors.black54),
+        subtitle2: TextStyle(color: Colors.redAccent, fontSize: 12),
+        button: TextStyle(color: MyColor.basic[3]),
+      ),
+      textButtonTheme: TextButtonThemeData (
+        style: ButtonStyle(
+          alignment: Alignment.center,
+          fixedSize: MaterialStateProperty.all(Size(140,35)),
+          shape: MaterialStateProperty.all(StadiumBorder()),
+          backgroundColor: MaterialStateProperty.all(Colors.white),
+          foregroundColor: MaterialStateProperty.all(MyColor.basic[2]),
+          textStyle: MaterialStateProperty.all(TextStyle(fontSize: 14))
+        )
       ),
       inputDecorationTheme: InputDecorationTheme(
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(

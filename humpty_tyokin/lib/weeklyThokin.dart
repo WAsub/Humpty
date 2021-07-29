@@ -6,9 +6,9 @@ import 'package:humpty_tyokin/costomWidget/swipeContainer.dart';
 import 'package:humpty_tyokin/data/sqlite.dart';
 // ignore: must_be_immutable
 class WeeklyThokin extends StatefulWidget {
-  double height;
-  double width;
-  StreamController streamC;
+  final double height;
+  final double width;
+  final StreamController streamC;
   DateTime weeklyNow;
   WeeklyThokin({
     this.height,
@@ -56,11 +56,7 @@ class _WeeklyThokinState extends State<WeeklyThokin> {
                       ),
                       Text(
                         formatMD.format(SQLite.getWeekStartEnd(widget.weeklyNow)[0]) + "〜" + formatMD.format(SQLite.getWeekStartEnd(widget.weeklyNow)[1]),
-                        style: TextStyle(
-                          fontFamily: "RobotoMono",
-                          fontStyle: FontStyle.italic,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        style: Theme.of(context).textTheme.headline3
                       ),
                       IconButton(
                         icon: Icon(Icons.arrow_forward_ios, size: 20,),
@@ -84,17 +80,14 @@ class _WeeklyThokinState extends State<WeeklyThokin> {
                   ? ListView.separated(
                       itemCount: list.length,
                       itemBuilder: (context, index) {
-                        TextStyle style1 = TextStyle(color: Colors.white, fontSize: 16,);
-                        TextStyle style2 = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold);
-                                        
-                        return Row(
+                          return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(list[index].money > 0 ? "収入" : "支出", style: style1),
-                              Text("\¥" + list[index].money.toString(), style: style2),
-                              Text(formatMD.format(list[index].date).toString(), style: style1),
+                              Text(list[index].money > 0 ? "収入" : "支出", style: Theme.of(context).textTheme.headline5),
+                              Text("\¥" + list[index].money.toString(), style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.bold)),
+                              Text(formatMD.format(list[index].date).toString(), style: Theme.of(context).textTheme.headline5),
                             ],
-                        );
+                          );
                       },
                       separatorBuilder: (context, index) => Divider(height: 5,),
                     ) 

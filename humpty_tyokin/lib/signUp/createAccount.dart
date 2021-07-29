@@ -46,22 +46,13 @@ class _CreateAccountState extends State<CreateAccount> {
                   height: deviceHeight*0.2,
                   child: Text("お金管理アプリ\n\n\n\n私たちと貯金を始めましょう！",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500, 
-                      fontSize: 16,
-                    ),
+                    style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.w500)
                   ),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 30),
-                  // ignore: deprecated_member_use
-                  child: FlatButton(
-                    height: 35,
-                    minWidth: 140,
-                    child: Text('設定を行う',style: TextStyle(color: Theme.of(context).accentColor),),
-                    color: Colors.white,
-                    shape: StadiumBorder(),
+                  child: TextButton(
+                    child: Text('設定を行う'),
                     onPressed: () {
                       Navigator .of(context).push(
                         MaterialPageRoute(builder: (context) {

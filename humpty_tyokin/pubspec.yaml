@@ -103,4 +103,5 @@ flutter:
 flutter_icons:
   android: true
   ios: true
-  image_path: "images/cotsumiAppIcon.png"
+  image_path_ios: "images/cotsumiAppIcon.png"
+  image_path_android: "images/cotsumiAppIcon2.png"
