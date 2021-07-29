@@ -23,7 +23,6 @@ void main(){
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,//縦固定
   ]);
-  //runApp
   runApp(MyApp());
 }
 
@@ -49,26 +48,26 @@ class Cotsumi extends StatefulWidget {
 class _CotsumiState extends State<Cotsumi> {
   double deviceHeight;
   double deviceWidth;
-  /** ローカルデータベースから抽出したデータ */
-  List<Thokin> _thokinData = [];
-  int total = 0;
-  int goal = 0;
-  /** 初期化を一回だけするためのライブラリ */
+  /// 初期化を一回だけするためのライブラリ
   final AsyncMemoizer memoizer = AsyncMemoizer();
-  /** リロード時のぐるぐる */
+  /// リロード時のぐるぐる
   Widget cpi;
-  /** コイン枚数のスワイプ用 */
+  /// ログインデータ
+  List<String> _loginData = ["", "", ""];
+  /// ローカルデータベースから抽出したデータ
+  List<Thokin> _thokinData = [];
+  int _total = 0;
+  int _goal = 0;
+  /// コイン枚数のスワイプ用
   double swip = 700;
   bool swipFlg = true;
-  /** 週間貯金データ用 */
+  /// 週間貯金データ用
   // DateTime weeklyNowShow = DateTime.now();
   DateTime weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); //TODO テスト用
   DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
   DateFormat formatMD = DateFormat('M/d');
-  /** 週間貯金データコンテナ部分生成用 */
+  /// 週間貯金データコンテナ部分生成用
   final _streamController = StreamController();
-  /** ログインデータ */
-  List<String> _loginData = ["", "", ""];
 
   @override
   void dispose() {
@@ -125,9 +124,9 @@ class _CotsumiState extends State<Cotsumi> {
   /** 目標達成しているか */
   Future<void> isAchieve() async {
     /** 目標達成していたらダイアログ表示 */
-    if(goal == 0){
+    if(_goal == 0){
       return;
-    }else if(total >= goal){
+    }else if(_total >= _goal){
       /** 目標達成登録 */
       await SQLite.achieveNowGoal(true);
       await HttpRes.remoteGoalsUpdate();
@@ -136,7 +135,7 @@ class _CotsumiState extends State<Cotsumi> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return AchieveDialog(goal: goal,);
+          return AchieveDialog(goal: _goal,);
         }
       );
       await loading();
@@ -146,7 +145,7 @@ class _CotsumiState extends State<Cotsumi> {
   /** ローディング処理 */
   Future<void> loading() async {
     /** 更新終わるまでグルグルを出しとく */
-    setState(() => cpi = CircularProgressIndicator());
+    setState(() => cpi = CircularProgressIndicator(color: Theme.of(context).selectedRowColor,));
     /** サーバーからデータを取得してローカルのデータを入れ替え */
     HttpRes.getThokinData();
     /** データを取得 */
@@ -157,11 +156,11 @@ class _CotsumiState extends State<Cotsumi> {
     /** データをセット */
     setState(() {
       _thokinData = getlist;
-      total = 0;
+      _total = 0;
       for (int i = 0; i < _thokinData.length; i++) {
-        total += _thokinData[i].money;
+        _total += _thokinData[i].money;
       }
-      goal = !nowgoal.flg ? nowgoal.goal : 0;
+      _goal = !nowgoal.flg ? nowgoal.goal : 0;
     });
     // 週間貯金データ(下のスワイプコンテナ用)
     /// setState(() => weeklyNowShow = DateTime.now());
@@ -184,17 +183,17 @@ class _CotsumiState extends State<Cotsumi> {
       Icon(CotsumiIcons.group, color: Theme.of(context).primaryColor,),
     ];
     List<Widget> titleText = [
-      Text("  "+_loginData[1], style: TextStyle(color: Colors.black54),),
-      Text("お知らせ", style: TextStyle(color: Colors.black54),),
-      Text("アカウント設定", style: TextStyle(color: Colors.black54),),
-      Text("達成履歴", style: TextStyle(color: Colors.black54),),
+      Text("  "+_loginData[1]),
+      Text("お知らせ"),
+      Text("アカウント設定"),
+      Text("達成履歴"),
     ];
     var onTap = [
       null,
       null,
       SettingAccount(
         myname: _loginData[1],
-        goal: goal,
+        goal: _goal,
       ),
       GoalHistory(),
     ];
@@ -254,8 +253,7 @@ class _CotsumiState extends State<Cotsumi> {
         deviceHeight = constraints.maxHeight;
         deviceWidth = constraints.maxWidth;
 
-        return Column(
-          children: [
+          return Column(children: [
             /** スワイプさせられるボタン(現在の画面を示すのも兼ねている) */
             Container(
               height: 50,
@@ -312,20 +310,15 @@ class _CotsumiState extends State<Cotsumi> {
                 child: Stack(alignment: AlignmentDirectional.center, children: [
                   /** 貯金額と目標達成率 */
                   CustomParameter(
-                    current: total, 
-                    currentColor: Theme.of(context).accentColor, 
-                    goal: goal, 
-                    goalColor: Theme.of(context).primaryColor, 
-                    color: Theme.of(context).accentColor, 
-                    backcolor: Theme.of(context).primaryColor, 
-                    strokeWidth: 26, height: deviceWidth * 0.8, 
+                    current: _total, 
+                    goal: _goal, 
+                    height: deviceWidth * 0.8, 
                     width: deviceWidth * 0.8
                   ),
                   /** 硬貨の枚数 */
                   SwipeCoinCounter(
                     swipL: swip,
                     thokinData: _thokinData,
-                    color: Theme.of(context).accentColor,
                     height: deviceHeight - 50,
                     width: deviceWidth,
                   ),
@@ -349,31 +342,33 @@ class _CotsumiState extends State<Cotsumi> {
                     ),
                   ),
                   /** スワイプさせられる矢印ボタン(画面によって左右変わる) */
-                  swipFlg
-                      ? Container(
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            icon: Icon(Icons.arrow_forward_ios),
-                            color: Theme.of(context).primaryColor,
-                            onPressed: () {
-                              setState(() {
-                                swip = 0;
-                                swipFlg = false;
-                              });
-                            },
-                          ))
-                      : Container(
-                          alignment: Alignment.centerLeft,
-                          child: IconButton(
-                            icon: Icon(Icons.arrow_back_ios),
-                            color: Theme.of(context).primaryColor,
-                            onPressed: () {
-                              setState(() {
-                                swip = deviceWidth;
-                                swipFlg = true;
-                              });
-                            },
-                          )),
+                  swipFlg ? 
+                    Container(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_forward_ios),
+                        color: Theme.of(context).primaryColor,
+                        onPressed: () {
+                          setState(() {
+                            swip = 0;
+                            swipFlg = false;
+                          });
+                        },
+                      )
+                    ) : 
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back_ios),
+                        color: Theme.of(context).primaryColor,
+                        onPressed: () {
+                          setState(() {
+                            swip = deviceWidth;
+                            swipFlg = true;
+                          });
+                        },
+                      )
+                    ),
                   /** 履歴画面(下スワイプ) */
                   // weeklyThokin.dart
                   WeeklyThokin(
@@ -384,17 +379,18 @@ class _CotsumiState extends State<Cotsumi> {
                   ),
                   /** ロード */
                   Container(
+                    alignment: Alignment.topCenter,
+                    padding: EdgeInsets.only(top: 10),
+                    child: Container(
                       alignment: Alignment.topCenter,
-                      padding: EdgeInsets.only(top: 10),
-                      child: Container(
-                        alignment: Alignment.topCenter,
-                        width: 25,
-                        height: 25,
-                        child: cpi,
-                      ))
-                ])),
-          ],
-        );
+                      width: 25,
+                      height: 25,
+                      child: cpi,
+                    )
+                  )
+                ])
+            ),
+          ]);
       }),
     );
   }

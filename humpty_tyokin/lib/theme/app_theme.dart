@@ -8,28 +8,56 @@ class AppTheme {
       primaryColor: MyColor.basic[1],
       accentColor: MyColor.basic[2],
       selectedRowColor: MyColor.basic[3],
-      focusColor: MyColor.basic[2],
       brightness: Brightness.light, 
-      colorScheme: scheme_basic(),
-      textTheme: text_basic(MyColor.basic[2]),
       primaryTextTheme: text_basic(Colors.white),
-      accentTextTheme: text_basic(Colors.white),
-      iconTheme: icon_basic(),
-      primaryIconTheme: icon_basic(),
-      accentIconTheme: icon_basic(),
-      textSelectionTheme: TextSelectionThemeData(cursorColor: MyColor.basic[2]),
+      primaryIconTheme: IconThemeData(color: Colors.white,),
+      colorScheme: scheme_basic(),
+      textTheme: TextTheme(
+        bodyText1: TextStyle(color: Colors.black54),
+        bodyText2: TextStyle(color: MyColor.basic[2]),
+        overline:  TextStyle(fontSize: 15, color: MyColor.basic[2]),
+        headline1: TextStyle(color: MyColor.basic[2]),
+        headline2: TextStyle(color: MyColor.basic[2]),
+        headline3: TextStyle(color: MyColor.basic[2]),
+        headline4: TextStyle(fontSize: 30,color: MyColor.basic[2]),
+        headline5: TextStyle(color: MyColor.basic[2]),
+        headline6: TextStyle(color: Colors.white),
+        subtitle1: TextStyle(color: Colors.redAccent, fontSize: 12),
+        subtitle2: TextStyle(color: MyColor.basic[2]),
+        button: TextStyle(color: MyColor.basic[2]),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(
+          width: 1.5,
+          color: MyColor.basic[1],
+        ),),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(
+          width: 1.5,
+          color: MyColor.basic[2],
+        ),),
+        /** labelStyleの色の変化がイマイチよく分からないのでColorSchemeのprimaryで設定 */
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide()
+        ),
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: MyColor.basic[2],
+        selectionColor: MyColor.basic[3].withAlpha(127),
+        selectionHandleColor: MyColor.basic[3],
+      ),
     );
   }
   static ColorScheme scheme_basic(){
     return ColorScheme(
-      primary: MyColor.basic[3],
+      primary: MyColor.basic[1],
       secondary: MyColor.basic[5],  
       background: MyColor.basic[1], 
       brightness: Brightness.light, 
       primaryVariant: MyColor.basic[5], 
       secondaryVariant: MyColor.basic[5], 
       surface: MyColor.basic[5],
-      error: MyColor.basic[5], 
+      error: MyColor.basic[3], 
       onPrimary: MyColor.basic[5], 
       onSecondary: MyColor.basic[5], 
       onBackground: MyColor.basic[5], 
@@ -41,20 +69,16 @@ class AppTheme {
     return TextTheme(
       bodyText1: TextStyle(color: color),
       bodyText2: TextStyle(color: color),
+      overline:  TextStyle(color: color),
       headline1: TextStyle(color: color),
       headline2: TextStyle(color: color),
       headline3: TextStyle(color: color),
       headline4: TextStyle(color: color),
       headline5: TextStyle(color: color),
       headline6: TextStyle(color: color),
-      subtitle1: TextStyle(color: Colors.black54),
+      subtitle1: TextStyle(color: color),
       subtitle2: TextStyle(color: color),
       button: TextStyle(color: color),
-    );
-  }
-  static IconThemeData icon_basic(){
-    return IconThemeData(
-      color: Colors.white,
     );
   }
   static ThemeData theme_rose() {

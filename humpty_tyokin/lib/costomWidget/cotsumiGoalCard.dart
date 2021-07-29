@@ -17,19 +17,20 @@ class CotsumiGoalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /** デフォルトデータ */
     entryDate = entryDate == null ? DateTime.now() : entryDate;
     achieveDate = achieveDate == null ? DateTime.now() : achieveDate;
     money = money == null ? 0 : money;
     flg = flg == null ? false : flg;
 
     DateFormat format = DateFormat('MM/dd');
-
+    /** 加工したデータ */
     String entryDateStr = format.format(entryDate);
     String achieveDateStr = format.format(achieveDate);
-    double deviceWidth;
+    double widgetWidth;
 
     return LayoutBuilder(builder: (context, constraints) {
-      deviceWidth = constraints.maxWidth;
+      widgetWidth = constraints.maxWidth;
 
       return Container(
         height: 75,
@@ -68,7 +69,7 @@ class CotsumiGoalCard extends StatelessWidget {
               ],
             ),
             Container(
-              width: deviceWidth - 121.35 - 57.6 - 17.4,
+              width: widgetWidth - 121.35 - 57.6 - 17.4,
               alignment: Alignment.centerRight,
               padding: EdgeInsets.only(right: 13.59),
               child: Text(

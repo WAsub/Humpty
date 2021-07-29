@@ -49,7 +49,7 @@ class AppTheme {
   static TextTheme text_basic(color){
     return TextTheme(
       bodyText1: TextStyle(color: color,),
-      bodyText2: TextStyle(color: color, fontSize: 41.425),
+      bodyText2: TextStyle(color: color, fontSize: 41.425), // デフォルト
       headline1: TextStyle(color: color),
       headline2: TextStyle(color: color),
       headline3: TextStyle(color: color),
