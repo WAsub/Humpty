@@ -145,6 +145,8 @@ class _InitialGoalState extends State<InitialGoal> {
                   ],
                 ),
               ));
-        })));
+        })
+      )
+    );
   }
 }

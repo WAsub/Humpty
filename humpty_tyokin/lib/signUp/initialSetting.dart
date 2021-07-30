@@ -75,7 +75,6 @@ class _InitialSettingState extends State<InitialSetting> {
       ),
     );
     
-
     return  WillPopScope(
       onWillPop: ()async=> false,
       child: Scaffold(
