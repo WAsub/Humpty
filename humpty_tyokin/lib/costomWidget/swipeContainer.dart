@@ -22,36 +22,39 @@ class SwipeContainer extends StatefulWidget{
 class SwipeContainerState extends State<SwipeContainer> {
   double dyStart = 0.0;
   double dyMove = 0.0;
+  bool flg = null;
   @override
   Widget build(BuildContext context) {
     /** デフォルト値 */
     widget.color = widget.color == null ? Theme.of(context).accentColor : widget.color;
+
       /** ウィジェット */
       return AnimatedPositioned(
-        duration: Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 120),
         bottom: -(widget.height - widget.swipB),
         child: GestureDetector(
           onVerticalDragStart: (DragStartDetails details){
+            /** スタート位置を指定 */
             dyStart = details.globalPosition.dy;
+            /** 上スワイプか下スワイプか */
+            flg = widget.swipB == 30 ? true : false;
           },
           onVerticalDragEnd: (details){
             setState(() {
-              if(dyMove-dyStart < -10){ widget.swipB = widget.height - 20; }
-              if(dyMove-dyStart >  10){ widget.swipB = 30; }
+              /** 上スワイプ または 下スワイプが十分じゃない時 */
+              if( (flg && dyMove-dyStart <= -50) || (!flg &&  dyMove-dyStart < 50) ){ 
+                widget.swipB = widget.height - 20; 
+              }
+              /** 下スワイプ または 上スワイプが十分じゃない時 */
+              if( (!flg && dyMove-dyStart >=  50) || (flg && dyMove-dyStart > -50 ) ){ 
+                widget.swipB = 30; 
+              }
             });
           },
           onVerticalDragUpdate: (DragUpdateDetails details) {
             dyMove = details.globalPosition.dy;
-            print(details.globalPosition.dy);
-            print(details.delta.dy);
-            setState(() {
-              widget.swipB = widget.height - details.globalPosition.dy;
-            //   dyMove = details.globalPosition.dy;
-            //   if (details.delta.dy < -10) { //上スワイプ
-            //     widget.swipB = widget.height - 20; }
-            //   if (details.delta.dy > 10) { //下スワイプ
-            //     widget.swipB = 30; }
-            });
+            //                                  上スワイプ                下スワイプ 
+            setState(() => widget.swipB = flg ? 30 + (dyStart-dyMove) : widget.height - 20 + (dyStart-dyMove) );
           },
           /** スワイプコンテナ */
           child: Container(

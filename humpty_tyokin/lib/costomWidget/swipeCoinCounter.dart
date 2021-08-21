@@ -32,7 +32,7 @@ class SwipeCoinCounterState extends State<SwipeCoinCounter> {
       return AnimatedPositioned(
         height: widget.height,
         width: widget.width,
-        duration: Duration(milliseconds: 250),
+        duration: Duration(milliseconds: 80),
         left: widget.swipL,
         /** スワイプコンテナ */
         child: CoinCounter(thokinData: widget.thokinData, color: widget.color)

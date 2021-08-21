@@ -54,14 +54,14 @@ class HttpRes{
     /** ユーザーIDを引き出して */
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String myId = (prefs.getString('myid') ?? "");
-    print(DataRequest(userid: myId).toJson());
+    print("HttpRes.DataRequest:${DataRequest(userid: myId).toJson()}");
     /** サーバーからデータを取得 */
     httpRes = await fetchApiResults(
       "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
       new DataRequest(userid: myId).toJson()
     );
-    print(httpRes.message);
-    print(httpRes.data);
+    print("message:${httpRes.message}");
+    print("data:${httpRes.data}");
     /** データを取得できたらローカルのデータを入れ替え */
     if (httpRes.message != "Failed") {
       List<Thokin> thokin = [];
@@ -95,7 +95,7 @@ class HttpRes{
       list[i].userId = myId;
       glist.add(list[i].toMap());
     }
-    print(GoalUpdateRequest(goallist: glist).toJson());
+    print("HttpRes.GoalUpdateRequest:${GoalUpdateRequest(goallist: glist).toJson()}");
     /** サーバーへ登録 */
     bool flg = false;
     while (!flg) {
@@ -104,8 +104,8 @@ class HttpRes{
         "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
         new GoalUpdateRequest(goallist: glist).toJson()
       );
-      print(httpRes.message);
-      print(httpRes.data);
+      print("message:${httpRes.message}");
+      print("data:${httpRes.data}");
       /** 成功したら端末に保存 */
       if(httpRes.message != "Failed"){
         flg = true;
@@ -117,7 +117,7 @@ class HttpRes{
   static Future<void> signUp(String name, String pass) async {
     /** HTTP通信 */
     ApiResults httpRes;
-    print(SignUpRequest(username: name, userpass: pass).toJson());
+    print("HttpRes.SignUpRequest${SignUpRequest(username: name, userpass: pass).toJson()}");
     bool flg = false;
     while (!flg) {
       /** サーバーへデータを送信 */
@@ -125,8 +125,8 @@ class HttpRes{
         "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
         new SignUpRequest(username: name, userpass: pass).toJson()
       );
-      print(httpRes.message);
-      print(httpRes.data);
+      print("message:${httpRes.message}");
+      print("data:${httpRes.data}");
       /** 成功したら端末に保存 */
       if(httpRes.message != "Failed"){
         String myid = httpRes.data["userid"];
@@ -154,7 +154,7 @@ class HttpRes{
   static Future<void> chengeName(String name) async {
     /** HTTP通信 */
     ApiResults httpRes;
-    print(ChengeNameRequest(username: name,).toJson());
+    print("HttpRes.ChengeNameRequest:${ChengeNameRequest(username: name,).toJson()}");
     bool flg = false;
     while (!flg) {
       /** サーバーへデータを送信 */
@@ -162,8 +162,8 @@ class HttpRes{
         "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
         new ChengeNameRequest(username: name,).toJson()
       );
-      print(httpRes.message);
-      print(httpRes.data);
+      print("message:${httpRes.message}");
+      print("data:${httpRes.data}");
       /** 成功したら端末に保存 */
       if(httpRes.message != "Failed"){
         SharedPreferences prefs = await SharedPreferences.getInstance();

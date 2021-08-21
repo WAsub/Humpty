@@ -61,6 +61,8 @@ class _CotsumiState extends State<Cotsumi> {
   /// コイン枚数のスワイプ用
   double swip = 700;
   bool swipFlg = true;
+  double dxStart = 0.0;
+  double dxMove = 0.0;
   /// 週間貯金データ用
   // DateTime weeklyNowShow = DateTime.now();
   DateTime weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); //TODO テスト用
@@ -324,22 +326,35 @@ class _CotsumiState extends State<Cotsumi> {
                   ),
                   /** スワイプによる画面の切り替え */
                   Container(
-                    child: GestureDetector(
-                      onHorizontalDragUpdate: (DragUpdateDetails details) {
-                        setState(() {
-                          if (details.delta.dx > 10) {
-                            //右スワイプ
-                            swip = deviceWidth;
-                            swipFlg = true;
-                          }
-                          if (details.delta.dx < -10) {
-                            //左スワイプ
-                            swip = 0;
-                            swipFlg = false;
-                          }
-                        });
-                      },
-                    ),
+                    /** 有効範囲を画面半分にして、切り替えごとに左右入れ替える */
+                    alignment: swipFlg ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      width: deviceWidth / 2,
+                      child: GestureDetector(
+                        onTap: (){}, // 画面に触れただけで切り替えが始まらないように
+                        onHorizontalDragStart: (DragStartDetails details) /** スタート位置を指定 */
+                          => dxStart = details.globalPosition.dx,
+                        onHorizontalDragEnd: (DragEndDetails details){
+                          setState(() {
+                            /** 左スワイプ または 右スワイプが十分じゃない時 */
+                            if( (swipFlg && dxMove-dxStart <= -100) || (!swipFlg &&  dxMove-dxStart < 100) ){ 
+                              swip = 0; 
+                              swipFlg = false;
+                            }
+                            /** 右スワイプ または 左スワイプが十分じゃない時 */
+                            if( (!swipFlg && dxMove-dxStart >=  100) || (swipFlg && dxMove-dxStart > -100 ) ){ 
+                              swip = deviceWidth; 
+                              swipFlg = true;
+                            }
+                          });
+                        },
+                        onHorizontalDragUpdate: (DragUpdateDetails details) {
+                          dxMove = details.globalPosition.dx;
+                          /** 指の場所の座標を当てる */
+                          setState(() => swip = dxMove);
+                        },
+                      ),
+                    )
                   ),
                   /** スワイプさせられる矢印ボタン(画面によって左右変わる) */
                   swipFlg ? 
