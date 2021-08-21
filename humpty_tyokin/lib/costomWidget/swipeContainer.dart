@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 class SwipeContainer extends StatefulWidget{
-  double height;
-  double width;
+  final double height;
+  final double width;
   double swipB;
-  Widget child;
+  final Widget child;
   Color color;
   
   SwipeContainer({
-    this.height,
-    this.width,
-    this.swipB,
-    this.child,
+    this.height = 500,
+    this.width = null,
+    this.swipB = 30,
+    this.child = null,
     this.color,
   });
   @override
@@ -20,25 +20,41 @@ class SwipeContainer extends StatefulWidget{
 
 
 class SwipeContainerState extends State<SwipeContainer> {
+  double dyStart = 0.0;
+  double dyMove = 0.0;
+  bool flg = null;
   @override
   Widget build(BuildContext context) {
-    widget.height = widget.height == null ? 500.0 : widget.height;
-    widget.width = widget.width == null ? null : widget.width;
-    widget.swipB = widget.swipB == null ? 30.0 : widget.swipB;
-    widget.child = widget.child == null ? null : widget.child;
-    widget.color = widget.color == null ? Colors.blue : widget.color;
+    /** デフォルト値 */
+    widget.color = widget.color == null ? Theme.of(context).accentColor : widget.color;
 
-    return AnimatedPositioned(
-        duration: Duration(milliseconds: 200),
+      /** ウィジェット */
+      return AnimatedPositioned(
+        duration: Duration(milliseconds: 120),
         bottom: -(widget.height - widget.swipB),
         child: GestureDetector(
-          onVerticalDragUpdate: (DragUpdateDetails details) {
+          onVerticalDragStart: (DragStartDetails details){
+            /** スタート位置を指定 */
+            dyStart = details.globalPosition.dy;
+            /** 上スワイプか下スワイプか */
+            flg = widget.swipB == 30 ? true : false;
+          },
+          onVerticalDragEnd: (details){
             setState(() {
-              if (details.delta.dy < -10) { //上スワイプ
-                widget.swipB = widget.height - 20; }
-              if (details.delta.dy > 10) { //下スワイプ
-                widget.swipB = 30; }
+              /** 上スワイプ または 下スワイプが十分じゃない時 */
+              if( (flg && dyMove-dyStart <= -50) || (!flg &&  dyMove-dyStart < 50) ){ 
+                widget.swipB = widget.height - 20; 
+              }
+              /** 下スワイプ または 上スワイプが十分じゃない時 */
+              if( (!flg && dyMove-dyStart >=  50) || (flg && dyMove-dyStart > -50 ) ){ 
+                widget.swipB = 30; 
+              }
             });
+          },
+          onVerticalDragUpdate: (DragUpdateDetails details) {
+            dyMove = details.globalPosition.dy;
+            //                                  上スワイプ                下スワイプ 
+            setState(() => widget.swipB = flg ? 30 + (dyStart-dyMove) : widget.height - 20 + (dyStart-dyMove) );
           },
           /** スワイプコンテナ */
           child: Container(
@@ -66,6 +82,6 @@ class SwipeContainerState extends State<SwipeContainer> {
             ]),
           ),
         ),
-    );
+      );
   }
 }

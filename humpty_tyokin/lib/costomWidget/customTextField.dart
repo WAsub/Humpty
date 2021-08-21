@@ -54,23 +54,8 @@ class CustomTextFieldState extends State<CustomTextField> {
         focusNode: widget.focusNode,
         controller: widget.controller,
         decoration: new InputDecoration(
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 1.5,
-                color: Theme.of(context).primaryColor,
-            ),),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 1.5,
-                color: Theme.of(context).accentColor,
-            ),),
           labelText: widget.labelText,
           hintText: widget.hintText,
-          hintStyle: TextStyle(fontSize: widget.hintFontSize,),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: BorderSide()
-          ),
         ),
         style: TextStyle(fontSize: widget.fontSize,),
         textAlign: TextAlign.right,

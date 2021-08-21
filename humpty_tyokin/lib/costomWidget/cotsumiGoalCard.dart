@@ -17,19 +17,20 @@ class CotsumiGoalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /** デフォルトデータ */
     entryDate = entryDate == null ? DateTime.now() : entryDate;
     achieveDate = achieveDate == null ? DateTime.now() : achieveDate;
     money = money == null ? 0 : money;
     flg = flg == null ? false : flg;
 
     DateFormat format = DateFormat('MM/dd');
-
+    /** 加工したデータ */
     String entryDateStr = format.format(entryDate);
     String achieveDateStr = format.format(achieveDate);
-    double deviceWidth;
+    double widgetWidth;
 
     return LayoutBuilder(builder: (context, constraints) {
-      deviceWidth = constraints.maxWidth;
+      widgetWidth = constraints.maxWidth;
 
       return Container(
         height: 75,
@@ -47,14 +48,14 @@ class CotsumiGoalCard extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     "〜",
-                    style: TextStyle(fontSize: 17.4, fontFamily: 'RobotoMono', fontStyle: FontStyle.italic, color: Color(0xffeaeea2)),
+                    style: Theme.of(context).textTheme.headline3.copyWith(fontSize: 17.4)
                   ),
                 ),
                 Container(
                   alignment: Alignment.topLeft,
                   child: Text(
                     entryDateStr,
-                    style: TextStyle(fontSize: 22, fontFamily: 'RobotoMono', fontStyle: FontStyle.italic, color: Color(0xffeaeea2)),
+                    style: Theme.of(context).textTheme.headline3.copyWith(fontSize: 22)
                   ),
                 ),
                 Container(
@@ -62,39 +63,39 @@ class CotsumiGoalCard extends StatelessWidget {
                   alignment: Alignment.bottomRight,
                   child: Text(
                     achieveDateStr,
-                    style: TextStyle(fontSize: 22, fontFamily: 'RobotoMono', fontStyle: FontStyle.italic, color: Color(0xffeaeea2)),
+                    style: Theme.of(context).textTheme.headline3.copyWith(fontSize: 22)
                   ),
                 ),
               ],
             ),
             Container(
-              width: deviceWidth - 121.35 - 57.6 - 17.4,
+              width: widgetWidth - 121.35 - 57.6 - 17.4,
               alignment: Alignment.centerRight,
               padding: EdgeInsets.only(right: 13.59),
               child: Text(
                 "¥" + money.toString(),
-                style: TextStyle(fontSize: 22, color: Theme.of(context).accentColor),
+                style: TextStyle(fontSize: 22),
               ),
             ),
             Stack(
               children: [
                 flg
-                    ? Container(
-                        alignment: Alignment.bottomCenter,
-                        width: 57.6,
-                        child: Icon(
-                          CotsumiIcons.check,
-                          size: 60,
-                          color: Color(0xffeaeea2),
-                        ),
-                      )
-                    : Container(),
+                ? Container(
+                    alignment: Alignment.bottomCenter,
+                    width: 57.6,
+                    child: Icon(
+                      CotsumiIcons.check,
+                      size: 60,
+                      color: Color(0xffeaeea2),
+                    ),
+                  )
+                : Container(),
                 Container(
                   alignment: Alignment.center,
                   width: 57.6,
                   child: Text(
                     flg ? "達成" : "未達成",
-                    style: TextStyle(fontSize: 17.4, fontWeight: FontWeight.w600, color: Theme.of(context).accentColor),
+                    style: TextStyle(fontSize: 17.4, fontWeight: FontWeight.w600),
                   ),
                 )
               ],

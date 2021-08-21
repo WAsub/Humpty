@@ -216,7 +216,6 @@ class SQLite {
         flg: maps[i]['flg'] != 0 ? true : false,
       ));
     }
-    print("Goals:$list");
     return list;
   }
 
@@ -245,7 +244,6 @@ class SQLite {
             memo: maps[0]['memo'],
             flg: maps[0]['flg'] != 0 ? true : false,
           );
-          // print("maxGoal:$maxGoal");
     return maxGoal;
   }
   /** 今の目標取得(日付順にIDふっているのでIDの最大値の行) */
@@ -255,7 +253,6 @@ class SQLite {
     maps = await db.rawQuery('SELECT MAX(id) FROM goals');
     int maxGoalId;
     maxGoalId = maps.isEmpty ? null : maps[0]['MAX(id)'];
-    print("maxGoalId:$maxGoalId");
     return maxGoalId;
   }
   /** 目標登録用 */

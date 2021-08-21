@@ -65,11 +65,7 @@ class _InitialGoalState extends State<InitialGoal> {
                       height: (deviceHeight - textFieldHeight) * 0.2 * nonShow,
                       child: Text(
                         "アカウント設定",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.w500)
                       ),
                     ),
                     Container(
@@ -86,11 +82,7 @@ class _InitialGoalState extends State<InitialGoal> {
                         child: Text(
                           "目標金額を設定してください\n(未入力の場合、後から設定できます)",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                          ),
+                          style: Theme.of(context).textTheme.headline5.copyWith(fontSize: 14,fontWeight: FontWeight.w500)
                         )),
                     Stack(
                       children: [
@@ -112,7 +104,7 @@ class _InitialGoalState extends State<InitialGoal> {
                           margin: EdgeInsets.only(top: 20),
                           child: Text(
                             errorMsg,
-                            style: TextStyle(color: Colors.redAccent, fontSize: 12),
+                            style: Theme.of(context).textTheme.subtitle2,
                           ),
                         )
                       ],
@@ -121,16 +113,8 @@ class _InitialGoalState extends State<InitialGoal> {
                       alignment: Alignment.topCenter,
                       height: ((deviceHeight - textFieldHeight) * 0.4 - 30),
                       margin: EdgeInsets.only(top: 30),
-                      // ignore: deprecated_member_use
-                      child: FlatButton(
-                        height: 35,
-                        minWidth: 140,
-                        child: Text(
-                          '貯めていく',
-                          style: TextStyle(color: Theme.of(context).accentColor),
-                        ),
-                        color: Colors.white,
-                        shape: StadiumBorder(),
+                      child: TextButton(
+                        child: Text('貯めていく'),
                         onPressed: () async {
                           bool flg = false;
                           setState(() => errorMsg = "");
@@ -153,9 +137,7 @@ class _InitialGoalState extends State<InitialGoal> {
                           }
                           if (flg) {
                             /** ここまで終わったらメイン画面に戻す */
-                            Navigator.pop(
-                              context,
-                            );
+                            Navigator.pop(context,);
                           }
                         },
                       ),
@@ -163,6 +145,8 @@ class _InitialGoalState extends State<InitialGoal> {
                   ],
                 ),
               ));
-        })));
+        })
+      )
+    );
   }
 }

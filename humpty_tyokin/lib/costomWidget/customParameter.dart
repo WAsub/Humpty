@@ -4,45 +4,38 @@ import 'dart:math' as math;
 import 'package:humpty_tyokin/costomWidget/cotsumi_icons_icons.dart';
 
 class CustomParameter extends StatelessWidget{
-  double strokeWidth;
+  final double strokeWidth;
   int current;
   Color currentColor;
   int goal;
   Color goalColor;
-  double height;
-  double width;
+  final double height;
+  final double width;
   Color color;
   Color backcolor;
   CustomParameter({
-    this.strokeWidth,
+    this.strokeWidth = 26,
     this.current,
     this.currentColor,
     this.goal,
     this.goalColor,
-    this.height,
-    this.width,
+    this.height = 300,
+    this.width = 300,
     this.color,
     this.backcolor,
   });
 
   @override
   Widget build(BuildContext context) {
-    if(strokeWidth == null){ strokeWidth = 28;}
-    if(height == null){ height = 300;}
-    if(width == null){ width = 300;}
-    if(color == null){ color = Colors.blue;}
-    if(backcolor == null){ backcolor = Colors.blueAccent[100];}
-    currentColor = currentColor == null ? Colors.black : currentColor;
-    goalColor = goalColor == null ? Colors.black : goalColor;
-
-    double parsent = current / goal;
-    // 未設定の場合0で割ることができないので
-    if(goal == 0){ 
-      parsent = 1;
-    }
-    
-
-    return Stack(
+    /** デフォルトカラー */
+    this.color = this.color == null ? Theme.of(context).accentColor : this.color;
+    this.backcolor = this.backcolor == null ? Theme.of(context).primaryColor : this.backcolor;
+    this.currentColor = this.currentColor == null ? Theme.of(context).accentColor : this.currentColor;
+    this.goalColor = this.goalColor == null ? Theme.of(context).primaryColor : this.goalColor;
+    /** 割合(未設定の場合0で割ることができないので1) */
+    double parsent = goal == 0 ? 1 : current / goal;
+      /** ウィジェット */
+      return Stack(
         alignment: AlignmentDirectional.center,
         children: [
           CustomPaint(
@@ -51,7 +44,8 @@ class CustomParameter extends StatelessWidget{
               strokeWidth: this.strokeWidth,
               color: this.color,
               backcolor: this.backcolor,
-              par: parsent),
+              par: parsent
+            ),
           ),
           /** 数字類 */
           Column(
@@ -71,7 +65,7 @@ class CustomParameter extends StatelessWidget{
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(CotsumiIcons.group,color: this.goalColor),
-                  Text(goal == 0 ? "未設定" : goal.toString(),style: TextStyle(color: this.goalColor),)
+                  Text(goal == 0 ? "未設定" : goal.toString(), style: TextStyle(color: this.goalColor),)
                 ],
               ),
             ],

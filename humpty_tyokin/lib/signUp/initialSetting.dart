@@ -75,7 +75,6 @@ class _InitialSettingState extends State<InitialSetting> {
       ),
     );
     
-
     return  WillPopScope(
       onWillPop: ()async=> false,
       child: Scaffold(
@@ -95,11 +94,7 @@ class _InitialSettingState extends State<InitialSetting> {
                     alignment: Alignment.bottomCenter,
                     height: (deviceHeight - textFieldHeight) * 0.2 * nonShow,
                     child: Text("アカウント設定",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500, 
-                        fontSize: 16,
-                      ),
+                      style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.w500)
                     ),
                   ),
                   Container(
@@ -112,11 +107,7 @@ class _InitialSettingState extends State<InitialSetting> {
                     height: (deviceHeight - textFieldHeight) * 0.1 * nonShow,
                     child: Text("ニックネームとパスワードを\n設定してください",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500, 
-                        fontSize: 14,
-                      ),
+                      style: Theme.of(context).textTheme.headline5.copyWith(fontSize: 14,fontWeight: FontWeight.w500)
                     )
                   ),
                   Stack(
@@ -150,24 +141,19 @@ class _InitialSettingState extends State<InitialSetting> {
                       Container(
                         alignment: Alignment.topCenter,
                         margin: EdgeInsets.only(top: 40 * nonMargin),
-                        child: Text(errorMsg1, style: TextStyle(color: Colors.redAccent, fontSize: 12),),),
+                        child: Text(errorMsg1, style: Theme.of(context).textTheme.subtitle2),),
                       Container(
                         alignment: Alignment.topCenter,
                         margin: EdgeInsets.only(top: 40 * nonMargin + 70),
-                        child: Text(errorMsg2, style: TextStyle(color: Colors.redAccent, fontSize: 12),),)
+                        child: Text(errorMsg2, style: Theme.of(context).textTheme.subtitle2),)
                     ],
                   ),
                   Container(
                     alignment: Alignment.topCenter,
                     height: ((deviceHeight- textFieldHeight) * 0.4 - 30),
                     margin: EdgeInsets.only(top: 30),
-                    // ignore: deprecated_member_use
-                    child: FlatButton(
-                      height: 35,
-                      minWidth: 140,
-                      child: Text('貯金額設定',style: TextStyle(color: Theme.of(context).accentColor),),
-                      color: Colors.white,
-                      shape: StadiumBorder(),
+                    child: TextButton(
+                      child: Text('貯金額設定'),
                       onPressed: () async {
                         /** 正規表現 */
                         bool flg = true;
