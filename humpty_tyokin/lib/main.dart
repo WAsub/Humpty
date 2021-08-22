@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:async/async.dart';
+import 'package:humpty_tyokin/signOutDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
@@ -16,6 +17,8 @@ import 'package:humpty_tyokin/achieveDialog.dart';
 import 'package:humpty_tyokin/goalHistory.dart';
 import 'package:humpty_tyokin/settingAccount.dart';
 import 'package:humpty_tyokin/weeklyThokin.dart';
+
+import 'signIn/login.dart';
 
 void main(){
   WidgetsFlutterBinding.ensureInitialized();
@@ -81,10 +84,44 @@ class _CotsumiState extends State<Cotsumi> {
   @override
   void initState() {
     super.initState();
-    /** 初回起動時のアカウント作成 */
-    isFirst();
-    /** ログインの有無 */
-    isLogin();
+    init();
+    // /** 初回起動時のアカウント作成 */
+    // isFirst();
+    // /** ログインの有無 */
+    // isLogin();
+  }
+
+  Future<void> init() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final bool first = (prefs.getBool('first') ?? false);
+    final String myId = (prefs.getString("myid") ?? "");
+    final String myAct = (prefs.getString("myname") ?? "");
+    final String mypass = (prefs.getString("mypass") ?? "");
+    if (!first) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) {
+          // チュートリアル画面へ
+          return CreateAccount();
+        }),
+      ).then((value) async {
+        /** リロード */
+        isLogin();
+        loading();
+      });
+    }else if (myAct != "" && mypass != "") {
+      setState(() => _loginData = [myId, myAct, mypass]);
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) {
+          // ログイン画面へ
+          return Login();
+        }),
+      ).then((value) async {
+        /** リロード */
+        init();
+        loading();
+      });
+    }
   }
 
   /** チュートリアルを出すか判定 */
@@ -114,12 +151,12 @@ class _CotsumiState extends State<Cotsumi> {
     if (myAct != "" && mypass != "") {
       setState(() => _loginData = [myId, myAct, mypass]);
     } else {
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(builder: (context) {
-      //     // ログイン画面へ
-      //     // return CreateAccount();
-      //   }),
-      // );
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) {
+          // ログイン画面へ
+          return Login();
+        }),
+      );
     }
   }
 
@@ -191,9 +228,10 @@ class _CotsumiState extends State<Cotsumi> {
       Text("達成履歴"),
     ];
     var onTap = [
-      null,
+      "logout",
       null,
       SettingAccount(
+        myid: _loginData[0],
         myname: _loginData[1],
         goal: _goal,
       ),
@@ -222,8 +260,19 @@ class _CotsumiState extends State<Cotsumi> {
               return ListTile(
                 leading: leadingIcon[index], // 左のアイコン
                 title: titleText[index], // テキスト
-                onTap: () {
-                  if (onTap[index] != null)
+                onTap: () async {
+                  if(onTap[index] == "logout"){
+                    /** ダイアログ表示 */
+                    await showDialog<int>(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return SignOutDialog();
+                      }
+                    ).then((value) async {
+                      await init();
+                    });
+                  }else if (onTap[index] != null){
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) {
                         // ログイン画面へ
@@ -233,6 +282,7 @@ class _CotsumiState extends State<Cotsumi> {
                       await isLogin();
                       await loading();
                     });
+                  }
                 },
               );
             },

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:humpty_tyokin/data/apiResults.dart';
 import 'package:humpty_tyokin/data/sqlite.dart';
@@ -35,13 +37,29 @@ class SignUpRequest {
     'userpass': userpass,
   };
 }
+/** ログイン用 */
+class SignInRequest {
+  final String userid;
+  final String userpass;
+  SignInRequest({
+    this.userid,
+    this.userpass,
+  });
+  Map<String, dynamic> toJson() => {
+    'userid': userid,
+    'userpass': userpass,
+  };
+}
 /** ニックネーム変更用 */
 class ChengeNameRequest {
+  final String userid;
   final String username;
   ChengeNameRequest({
+    this.userid,
     this.username,
   });
   Map<String, dynamic> toJson() => {
+    'userid': userid,
     'username': username,
   };
 }
@@ -150,17 +168,50 @@ class HttpRes{
       // TODO テスト用
     }
   }
-  /** ニックネーム変更用 */
-  static Future<void> chengeName(String name) async {
+  /** サインイン */
+  static Future<String> signIn(String id, String pass) async {
     /** HTTP通信 */
     ApiResults httpRes;
-    print("HttpRes.ChengeNameRequest:${ChengeNameRequest(username: name,).toJson()}");
+    print("HttpRes.SignInRequest${SignInRequest(userid: id, userpass: pass).toJson()}");
     bool flg = false;
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
         "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-        new ChengeNameRequest(username: name,).toJson()
+        new SignInRequest(userid: id, userpass: pass).toJson()
+      );
+      print("message:${httpRes.message}");
+      print("data:${httpRes.data}");
+      /** 成功したらループを抜ける */
+      if(httpRes.message != "Failed"){
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("myid", id);
+        await prefs.setString("myname", httpRes.data["name"]);
+        await prefs.setString("mypass", pass);
+        flg = true;
+      }
+      // TODO テスト用
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("myid", id);
+      await prefs.setString("myname", "テスト");
+      await prefs.setString("mypass", pass);
+      flg = true;
+      // TODO テスト用
+    }
+    /** メッセージを返す */
+    return httpRes.message;
+  }
+  /** ニックネーム変更用 */
+  static Future<void> chengeName(String id,String name) async {
+    /** HTTP通信 */
+    ApiResults httpRes;
+    print("HttpRes.ChengeNameRequest:${ChengeNameRequest(userid: id,username: name,).toJson()}");
+    bool flg = false;
+    while (!flg) {
+      /** サーバーへデータを送信 */
+      httpRes = await fetchApiResults(
+        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        new ChengeNameRequest(userid: id,username: name,).toJson()
       );
       print("message:${httpRes.message}");
       print("data:${httpRes.data}");
