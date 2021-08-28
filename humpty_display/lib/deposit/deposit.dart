@@ -3,10 +3,6 @@ import 'dart:async';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import '../data/httpResponse.dart';
-import 'package:humpty_display/costomWidget/enterCoinCount.dart';
-import 'package:humpty_display/data/sqlite.dart';
-
-import '../costomWidget/numericKeypad.dart';
 import 'confirmation_d.dart';
 
 class Deposit extends StatefulWidget {
@@ -23,21 +19,7 @@ class Deposit extends StatefulWidget {
 class _DepositState extends State<Deposit> {
   double deviceHeight;
   double deviceWidth;
-  /** 初期化を一回だけするためのライブラリ */
-  final AsyncMemoizer memoizer = AsyncMemoizer();
-  
-  /** ローディング処理 */
-  Future<void> loading() async {
-    /** データをセット */
-    
-  }
 
-  @override
-  void initState() {
-    /** 一度だけロードする */
-    memoizer.runOnce(() async => loading());
-    super.initState();
-  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -57,9 +39,13 @@ class _DepositState extends State<Deposit> {
                             size: 50,
                             color: Theme.of(context).accentColor,
                           ),
-                          onPressed: () {
-                            HttpRes.sendDepositFlg(null);
-                            Navigator.pop(context,"");
+                          onPressed: () async {
+                            // 入金処理中断フラグ送信
+                            bool flg = await HttpRes.sendDepositFlg(null);
+                            // 戻る
+                            if(flg){
+                              Navigator.pop(context,"");
+                            }
                           },
                         ),
                         Container(
@@ -83,10 +69,11 @@ class _DepositState extends State<Deposit> {
                         style: TextStyle(fontSize: 41.425),
                       ),
                       onPressed: () async {
+                        // 現在の入金額取得
                         int money = await HttpRes.getDepositMoney();
                         Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) {
-                            // ログイン画面へ
+                            // 次の画面へ
                             return ConfirmationD(money: money, total: widget.total,);
                           }),
                         ).then((value) async {

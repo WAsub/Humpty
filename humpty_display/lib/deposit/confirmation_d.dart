@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:humpty_display/data/httpResponse.dart';
-import '../costomWidget/previewCoinCount.dart';
 
 class ConfirmationD extends StatefulWidget {
   final int money;
@@ -99,9 +98,12 @@ class _ConfirmationDState extends State<ConfirmationD> {
                 children: [
                   TextButton(
                     child: Text("確定", style: TextStyle(fontSize: 41.425),),
-                    onPressed: () {
-                      HttpRes.sendDepositFlg(false);
-                      Navigator.pop(context,"return");
+                    onPressed: () async {
+                      // 入金処理終了フラグ送信
+                      bool flg = await HttpRes.sendDepositFlg(false);
+                      if(flg){
+                        Navigator.pop(context,"return");
+                      }
                     }
                   ),
                 ],

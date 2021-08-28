@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:humpty_display/costomWidget/customCoinCount.dart';
 import 'package:humpty_display/costomWidget/enterCoinCount.dart';
 import 'package:humpty_display/data/sqlite.dart';
 
-import '../costomWidget/numericKeypad.dart';
 import 'confirmation_w.dart';
 
 class Withdrawal extends StatefulWidget {
@@ -146,7 +144,8 @@ class _WithdrawalState extends State<Withdrawal> {
                       ),
                       Container(
                         color: Colors.white,
-                        width: deviceWidth * 0.45,
+                        // width: deviceWidth * 0.45,
+                        width: (deviceHeight * 0.8 * 0.6) / 7.5 * 10,
                         height: deviceHeight * 0.8 * 0.6,
                         child: EnterCoinCount(
                           maxData: coinMax,
@@ -156,11 +155,9 @@ class _WithdrawalState extends State<Withdrawal> {
                               print('$key : ${data[key]}');
                               m += key * data[key];
                             }
-                            // setState(() {
-                              _streamController.sink.add(m);
-                              money = m;
-                              coinData = data;
-                            // });
+                            _streamController.sink.add(m);
+                            money = m;
+                            coinData = data;
                             print(data);
                           },
                         ),
@@ -186,7 +183,7 @@ class _WithdrawalState extends State<Withdrawal> {
                         print(money);
                         Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) {
-                            // ログイン画面へ
+                            // 次の画面へ
                             return ConfirmationW(money: money, coinData: coinData, total: widget.total,);
                           }),
                         ).then((value) async {

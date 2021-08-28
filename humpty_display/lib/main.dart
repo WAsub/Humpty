@@ -14,10 +14,8 @@ void main(){
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,//横固定
   ]);
-  //runApp
   runApp(MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   @override
@@ -83,7 +81,7 @@ class _CotsumiDisplayState extends State<CotsumiDisplay> {
       onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: Colors.white,
-        body:  LayoutBuilder(builder: (context, constraints) {
+        body: LayoutBuilder(builder: (context, constraints) {
             deviceHeight = constraints.maxHeight;
             deviceWidth = constraints.maxWidth;
 
@@ -123,25 +121,38 @@ class _CotsumiDisplayState extends State<CotsumiDisplay> {
                     TextButton(
                       child: Text("入金",),
                       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),),
-                      onPressed: () {
-                        HttpRes.sendDepositFlg(true);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) {
-                            // 入金画面へ
-                            return Deposit(total: total,);
-                          }),
-                        );
+                      onPressed: () async {
+                        // 入金処理開始フラグ送信
+                        bool flg = await HttpRes.sendDepositFlg(true);
+                        if(flg){
+                          // 画面遷移
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) {
+                              // 入金画面へ
+                              return Deposit(total: total,);
+                            }),
+                          ).then((value) async {
+                            if(value == "return"){
+                              loading();
+                            }
+                          });
+                        }
                       }
                     ),
                     TextButton(
                       child: Text("出金",),
                       onPressed: () {
+                        // 画面遷移
                         Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) {
                             // 出金画面へ
                             return Withdrawal(thokinData: _thokinData, total: total,);
                           }),
-                        );
+                        ).then((value) async {
+                          if(value == "return"){
+                            loading();
+                          }
+                        });
                       }
                     )  
                   ],

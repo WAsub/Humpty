@@ -24,7 +24,7 @@ class WithdrawMoneyRequest {
     'withdrawMoney': money.toMap(),
   };
 }
-/** 入金処理開始フラグ送信 */
+/** 入金処理開始フラグ送信用 */
 class DepositFlgRequest{
   final DateTime date;
   final bool flg;
@@ -80,7 +80,7 @@ class HttpRes{
     }
   }
   /** 出金額送信 */
-  static Future<void> sendWithdrawMoney(Map<int,int> data) async {
+  static Future<bool> sendWithdrawMoney(Map<int,int> data) async {
     /** HTTP通信 */
     ApiResults httpRes;
     /** Thokinに入れ替え */
@@ -109,9 +109,10 @@ class HttpRes{
       }
       flg = true; // TODO テスト用
     }
+    return flg;
   }
   /** 入金処理開始フラグ送信 */
-  static Future<void> sendDepositFlg(bool sendflg) async {
+  static Future<bool> sendDepositFlg(bool sendflg) async {
     /** HTTP通信 */
     ApiResults httpRes;
     /** Thokinに入れ替え */
@@ -131,6 +132,7 @@ class HttpRes{
       }
       flg = true; // TODO テスト用
     }
+    return flg;
   }
   /** 入金額取得 */
   static Future<int> getDepositMoney() async {
