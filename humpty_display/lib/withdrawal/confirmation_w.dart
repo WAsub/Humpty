@@ -103,15 +103,20 @@ class _ConfirmationWState extends State<ConfirmationW> {
                     child: Text("戻る", style: TextStyle(fontSize: 41.425),),
                     style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),),
                     onPressed: () {
-                      // print(money);
                       Navigator.pop(context,"");
                     }
                   ),
                   TextButton(
                     child: Text("確定", style: TextStyle(fontSize: 41.425),),
-                    onPressed: () {
-                      HttpRes.sendWithdrawMoney(widget.coinData);
-                      Navigator.pop(context,"return");
+                    onPressed: () async {
+                      Map<int,int> sendData = widget.coinData;
+                      if(sendData == null){
+                        sendData = {500: 0, 100: 0, 50: 0, 10: 0, 5: 0, 1: 0};
+                      }
+                      bool flg = await HttpRes.sendWithdrawMoney(sendData);
+                      if(flg){
+                        Navigator.pop(context,"return");
+                      }
                     }
                   ),
                 ],
