@@ -12,11 +12,15 @@
   あとはサーバーとAPI完成後に瑕疵がないか確認と調整をするだけ。  
   2021/07/27現在  
   細かいバグ修正。  
+  2021/08/30現在  
+  細かいバグ修正。危うい部分を修正。  
 ### [humpty_display](https://github.com/WAsub/Humpty/edit/main/humpty_display)
   cotumi 貯金箱本体のディスプレイ用アプリ  
   2021/07/27現在  
   ほぼ完成。  
   あとはサーバーとAPI完成後に瑕疵がないか確認と調整をするだけ。
+  2021/08/30現在  
+  細かいバグ修正。危うい部分を修正。
 ***
 ## テスト用
 ### [humpty_sumple_gesturedetector](https://github.com/WAsub/Humpty/edit/main/humpty_sumple_gesturedetector)
