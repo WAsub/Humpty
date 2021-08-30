@@ -15,7 +15,7 @@ class ApiResults {
     return ApiResults(message: msg, data: null);
   }
   factory ApiResults.fromJson(Map<String, dynamic> json) {
-    return ApiResults(message: json['message'], data: json['data']);
+    return ApiResults(message: json['message'], data: json['Data']);
   }
 }
 
