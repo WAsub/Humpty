@@ -107,7 +107,7 @@ class HttpRes{
       if (httpRes.message != "Failed") {
         flg = true;
       }
-      flg = true; // TODO テスト用
+      // flg = true; // TODO テスト用
     }
     return flg;
   }
@@ -130,7 +130,7 @@ class HttpRes{
       if (httpRes.message != "Failed") {
         flg = true;
       }
-      flg = true; // TODO テスト用
+      // flg = true; // TODO テスト用
     }
     return flg;
   }
@@ -139,16 +139,20 @@ class HttpRes{
     /** HTTP通信 */
     ApiResults httpRes;
     print(DepositMoneyRequest(flg: true).toJson());
-    /** サーバーへデータを送信 */
-    httpRes = await fetchApiResults(
-      "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-      new DepositMoneyRequest(flg: true).toJson()
-    );
-    print(httpRes.message);
-    print(httpRes.data);
-    if (httpRes.message != "Failed") {
-      return httpRes.data["money"];
+    bool flg = false;
+    while (!flg) {
+      /** サーバーへデータを送信 */
+      httpRes = await fetchApiResults(
+        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        new DepositMoneyRequest(flg: true).toJson()
+      );
+      print(httpRes.message);
+      print(httpRes.data);
+      if (httpRes.message != "Failed") {
+        flg = true;
+        return httpRes.data["money"];
+      }
+      // return 233; // TODO テスト用
     }
-    return 233; // TODO テスト用
   }
 }

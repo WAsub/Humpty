@@ -166,7 +166,7 @@ class _LoginState extends State<Login> {
                         setState(() => errorMsg1 = "");
                         setState(() => errorMsg2 = "");
                         setState(() => errorMsg3 = "");
-                        if(!RegExp(r'^[0-9a-zA-Z]{1,10}$').hasMatch(nameController.text)){
+                        if(!RegExp(r'^[0-9a-zA-Z]{1,30}$').hasMatch(nameController.text)){
                           setState(() => errorMsg1 = "IDは半角英数,10字までです。");
                           flg = false;
                         }
@@ -178,7 +178,7 @@ class _LoginState extends State<Login> {
                         if(flg){
                           String results = await HttpRes.signIn(nameController.text,passController.text);
                           // テスト用
-                          results = "YES";
+                          // results = "YES";
                           print(results);
                           /** 次へ */
                           if(results == "YES"){

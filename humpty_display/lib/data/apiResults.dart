@@ -20,7 +20,7 @@ class ApiResults {
 }
 
 Future<ApiResults> fetchApiResults(url, requestMap) async {
-  return ApiResults.errorMsg("Failed");//TODO APIができるまで
+  // return ApiResults.errorMsg("Failed");//TODO APIができるまで
   var response;
   try{
     response = await http.post(url, body: json.encode(requestMap), headers: {"Content-Type": "application/json"});

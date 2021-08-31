@@ -33,8 +33,8 @@ class SignUpRequest {
     this.userpass,
   });
   Map<String, dynamic> toJson() => {
-    'username': username,
-    'userpass': userpass,
+    'USERNAME': username,
+    'PASSWORD': userpass,
   };
 }
 /** ログイン用 */
@@ -59,8 +59,8 @@ class ChengeNameRequest {
     this.username,
   });
   Map<String, dynamic> toJson() => {
-    'userid': userid,
-    'username': username,
+    'USERID': userid,
+    'USERNAME': username,
   };
 }
 /** HTTP通信系まとめ */
@@ -81,7 +81,7 @@ class HttpRes{
     print("message:${httpRes.message}");
     print("data:${httpRes.data}");
     /** データを取得できたらローカルのデータを入れ替え */
-    if (httpRes.message != "Failed") {
+    if (httpRes.message != "Failed" && httpRes.data != null) {
       List<Thokin> thokin = [];
       for (int i = 0; i < httpRes.data.length; i++) {
         thokin.add(Thokin(
@@ -128,7 +128,7 @@ class HttpRes{
       if(httpRes.message != "Failed"){
         flg = true;
       }
-      flg = true; // TODO テスト用
+      // flg = true; // TODO テスト用
     }
   }
   /** アカウント作成 */
@@ -140,7 +140,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        "http://10.16.10.64:8000/api/user/add/",
         new SignUpRequest(username: name, userpass: pass).toJson()
       );
       print("message:${httpRes.message}");
@@ -157,14 +157,14 @@ class HttpRes{
         flg = true;
       }
       // TODO テスト用
-      String myid = "abc"; 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("myid", myid);
-      await prefs.setString("myname", name);
-      await prefs.setString("mypass", pass);
-      await prefs.setBool("first", true);
-      await prefs.setBool("login", true);
-      flg = true;
+      // String myid = "abc"; 
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // await prefs.setString("myid", myid);
+      // await prefs.setString("myname", name);
+      // await prefs.setString("mypass", pass);
+      // await prefs.setBool("first", true);
+      // await prefs.setBool("login", true);
+      // flg = true;
       // TODO テスト用
     }
   }
@@ -177,7 +177,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        "http://10.16.10.64:8000/api/user/login/",
         new SignInRequest(userid: id, userpass: pass).toJson()
       );
       print("message:${httpRes.message}");
@@ -191,11 +191,11 @@ class HttpRes{
         flg = true;
       }
       // TODO テスト用
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("myid", id);
-      await prefs.setString("myname", "テスト");
-      await prefs.setString("mypass", pass);
-      flg = true;
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // await prefs.setString("myid", id);
+      // await prefs.setString("myname", "テスト");
+      // await prefs.setString("mypass", pass);
+      // flg = true;
       // TODO テスト用
     }
     /** メッセージを返す */
@@ -210,7 +210,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        "http://10.16.10.64:8000/api/user/update/",
         new ChengeNameRequest(userid: id,username: name,).toJson()
       );
       print("message:${httpRes.message}");
@@ -222,9 +222,9 @@ class HttpRes{
         flg = true;
       }
       // TODO テスト用
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("myname", name);
-      flg = true;
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // await prefs.setString("myname", name);
+      // flg = true;
       // TODO テスト用
     }
   }

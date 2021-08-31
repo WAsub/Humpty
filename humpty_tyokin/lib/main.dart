@@ -67,8 +67,8 @@ class _CotsumiState extends State<Cotsumi> {
   double dxStart = 0.0;
   double dxMove = 0.0;
   /// 週間貯金データ用
-  // DateTime weeklyNowShow = DateTime.now();
-  DateTime weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); //TODO テスト用
+  DateTime weeklyNowShow = DateTime.now();
+  // DateTime weeklyNowShow = DateTime.parse("2021-01-03 15:25:07"); //TODO テスト用
   DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
   DateFormat formatMD = DateFormat('M/d');
   /// 週間貯金データコンテナ部分生成用
@@ -105,7 +105,8 @@ class _CotsumiState extends State<Cotsumi> {
         }),
       ).then((value) async {
         /** リロード */
-        isLogin();
+        // isLogin();
+        init();
         loading();
       });
     }else if (myAct != "" && mypass != "") {
@@ -202,8 +203,8 @@ class _CotsumiState extends State<Cotsumi> {
       _goal = !nowgoal.flg ? nowgoal.goal : 0;
     });
     // 週間貯金データ(下のスワイプコンテナ用)
-    /// setState(() => weeklyNowShow = DateTime.now());
-    setState(() => weeklyNowShow = DateTime.parse("2021-01-03 15:25:07")); // TODO テスト用
+    setState(() => weeklyNowShow = DateTime.now());
+    // setState(() => weeklyNowShow = DateTime.parse("2021-01-03 15:25:07")); // TODO テスト用
     List<Thokin> getweeklist = await SQLite.getWeeklyThokin(weeklyNowShow);
     _streamController.sink.add(getweeklist); // StreamBuilderに流して部分生成
     /** 目標達成したか判定 */
