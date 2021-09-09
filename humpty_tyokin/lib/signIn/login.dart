@@ -181,7 +181,7 @@ class _LoginState extends State<Login> {
                           // results = "YES";
                           print(results);
                           /** 次へ */
-                          if(results == "YES"){
+                          if(results == "OK"){
                             Navigator.pop(context,);
                           }else{
                             setState(() => errorMsg3 = results);

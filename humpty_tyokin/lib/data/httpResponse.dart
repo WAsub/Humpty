@@ -11,7 +11,7 @@ class DataRequest {
     this.userid,
   });
   Map<String, dynamic> toJson() => {
-    'userid': userid,
+    'USERID': userid,
   };
 }
 /** リモートデータベースの目標リスト更新用 */
@@ -46,8 +46,8 @@ class SignInRequest {
     this.userpass,
   });
   Map<String, dynamic> toJson() => {
-    'userid': userid,
-    'userpass': userpass,
+    'USERID': userid,
+    'PASSWORD': userpass,
   };
 }
 /** ニックネーム変更用 */
@@ -140,7 +140,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://10.16.10.64:8000/api/user/add/",
+        "http://10.21.10.52:8000/api/user/add/",
         new SignUpRequest(username: name, userpass: pass).toJson()
       );
       print("message:${httpRes.message}");
@@ -174,19 +174,25 @@ class HttpRes{
     ApiResults httpRes;
     print("HttpRes.SignInRequest${SignInRequest(userid: id, userpass: pass).toJson()}");
     bool flg = false;
+    var decodeMsg;
+    var decodeUsername;
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://10.16.10.64:8000/api/user/login/",
+        "http://10.21.10.52:8000/api/user/login/",
         new SignInRequest(userid: id, userpass: pass).toJson()
       );
       print("message:${httpRes.message}");
       print("data:${httpRes.data}");
+      decodeMsg = utf8.decode(httpRes.message.runes.toList());
+      decodeUsername = utf8.decode(httpRes.data["username"].runes.toList());
+      print("utf8.decode:$decodeMsg");
+      print("utf8.decode:$decodeUsername");
       /** 成功したらループを抜ける */
-      if(httpRes.message != "Failed"){
+      if(decodeMsg != "Failed"){
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString("myid", id);
-        await prefs.setString("myname", httpRes.data["name"]);
+        await prefs.setString("myname", decodeUsername);
         await prefs.setString("mypass", pass);
         flg = true;
       }
@@ -199,7 +205,7 @@ class HttpRes{
       // TODO テスト用
     }
     /** メッセージを返す */
-    return httpRes.message;
+    return decodeMsg;
   }
   /** ニックネーム変更用 */
   static Future<void> chengeName(String id,String name) async {
@@ -210,7 +216,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://10.16.10.64:8000/api/user/update/",
+        "http://10.21.10.52:8000/api/user/update/",
         new ChengeNameRequest(userid: id,username: name,).toJson()
       );
       print("message:${httpRes.message}");
