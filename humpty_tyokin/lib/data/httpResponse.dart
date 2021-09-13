@@ -65,6 +65,7 @@ class ChengeNameRequest {
 }
 /** HTTP通信系まとめ */
 class HttpRes{
+  static String ipaddress = "192.168.0.32";
   /** 貯金データ取得 */
   static Future<void> getThokinData() async {
     /** HTTP通信 */
@@ -140,7 +141,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://10.21.10.51:8000/api/user/add/",
+        "http://"+ipaddress+":8000/api/user/add/",
         new SignUpRequest(username: name, userpass: pass).toJson()
       );
       print("message:${httpRes.message}");
@@ -179,7 +180,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://10.21.10.51:8000/api/user/login/",
+        "http://"+ipaddress+":8000/api/user/login/",
         new SignInRequest(userid: id, userpass: pass).toJson()
       );
       print("message:${httpRes.message}");
@@ -216,7 +217,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://10.21.10.51:8000/api/user/update/",
+        "http://"+ipaddress+":8000/api/user/update/",
         new ChengeNameRequest(userid: id,username: name,).toJson()
       );
       print("message:${httpRes.message}");
