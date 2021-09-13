@@ -140,7 +140,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://10.21.10.52:8000/api/user/add/",
+        "http://10.21.10.51:8000/api/user/add/",
         new SignUpRequest(username: name, userpass: pass).toJson()
       );
       print("message:${httpRes.message}");
@@ -179,7 +179,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://10.21.10.52:8000/api/user/login/",
+        "http://10.21.10.51:8000/api/user/login/",
         new SignInRequest(userid: id, userpass: pass).toJson()
       );
       print("message:${httpRes.message}");
@@ -216,7 +216,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://10.21.10.52:8000/api/user/update/",
+        "http://10.21.10.51:8000/api/user/update/",
         new ChengeNameRequest(userid: id,username: name,).toJson()
       );
       print("message:${httpRes.message}");
