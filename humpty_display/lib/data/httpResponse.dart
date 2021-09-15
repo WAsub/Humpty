@@ -11,16 +11,19 @@ class DataRequest {
     this.userid,
   });
   Map<String, dynamic> toJson() => {
-    'userid': userid,
+    'USERID': userid,
   };
 }
 /** 出金額送信用 */
 class WithdrawMoneyRequest {
+  final String userid;
   final Thokin money;
   WithdrawMoneyRequest({
+    this.userid,
     this.money,
   });
   Map<String, dynamic> toJson() => {
+    'USERID': userid,
     'withdrawMoney': money.toMap(),
   };
 }
@@ -49,13 +52,14 @@ class DepositMoneyRequest{
 }
 /** HTTP通信系まとめ */
 class HttpRes{
+  static String ipaddress = "10.21.10.54";
   static Future<void> getThokinData(String id) async {
     /** HTTP通信 */
     ApiResults httpRes;
     print(DataRequest(userid: id).toJson());
     /** サーバーからデータを取得 */
     httpRes = await fetchApiResults(
-      "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+      "http://"+ipaddress+":8000/api/money/show/",
       new DataRequest(userid: id).toJson()
     );
     print(httpRes.message);
@@ -80,7 +84,7 @@ class HttpRes{
     }
   }
   /** 出金額送信 */
-  static Future<bool> sendWithdrawMoney(Map<int,int> data) async {
+  static Future<bool> sendWithdrawMoney(String id, Map<int,int> data) async {
     /** HTTP通信 */
     ApiResults httpRes;
     /** Thokinに入れ替え */
@@ -94,13 +98,13 @@ class HttpRes{
       five_yen: data[5],
       one_yen: data[1]
     );
-    print(WithdrawMoneyRequest(money: money).toJson());
+    print(WithdrawMoneyRequest(userid: id, money: money).toJson());
     /** サーバーへ送信 */
     bool flg = false;
     while (!flg) {
       httpRes = await fetchApiResults(
-        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-        new WithdrawMoneyRequest(money: money).toJson()
+        "http://"+ipaddress+":8000/api/",
+        new WithdrawMoneyRequest(userid: id, money: money).toJson()
       );
       print(httpRes.message);
       print(httpRes.data);
@@ -122,7 +126,7 @@ class HttpRes{
     bool flg = false;
     while (!flg) {
       httpRes = await fetchApiResults(
-        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        "http://"+ipaddress+":8000/api/",
         new DepositFlgRequest(date: now, flg: true).toJson()
       );
       print(httpRes.message);
@@ -143,7 +147,7 @@ class HttpRes{
     while (!flg) {
       /** サーバーへデータを送信 */
       httpRes = await fetchApiResults(
-        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+        "http://"+ipaddress+":8000/api/",
         new DepositMoneyRequest(flg: true).toJson()
       );
       print(httpRes.message);

@@ -65,7 +65,7 @@ class ChengeNameRequest {
 }
 /** HTTP通信系まとめ */
 class HttpRes{
-  static String ipaddress = "192.168.0.32";
+  static String ipaddress = "10.21.10.54";
   /** 貯金データ取得 */
   static Future<void> getThokinData() async {
     /** HTTP通信 */
@@ -76,7 +76,7 @@ class HttpRes{
     print("HttpRes.DataRequest:${DataRequest(userid: myId).toJson()}");
     /** サーバーからデータを取得 */
     httpRes = await fetchApiResults(
-      "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+      "http://"+ipaddress+":8000/api/money/show/",
       new DataRequest(userid: myId).toJson()
     );
     print("message:${httpRes.message}");
@@ -129,7 +129,7 @@ class HttpRes{
       if(httpRes.message != "Failed"){
         flg = true;
       }
-      // flg = true; // TODO テスト用
+      flg = true; // TODO テスト用
     }
   }
   /** アカウント作成 */
