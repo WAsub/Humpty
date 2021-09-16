@@ -11,6 +11,7 @@ class Thokin {
   int fifty_yen;
   int hundred_yen;
   int five_hundred_yen;
+  DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
 
   Thokin({
     this.date,
@@ -25,7 +26,7 @@ class Thokin {
 
   Map<String, dynamic> toMap() {
     return {
-      'date': date,
+      'date': format.format(date),
       'money': money,
       'one_yen': one_yen,
       'five_yen': five_yen,

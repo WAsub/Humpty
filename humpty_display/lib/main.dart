@@ -53,7 +53,7 @@ class _CotsumiDisplayState extends State<CotsumiDisplay> {
     /** 更新終わるまでグルグルを出しとく */
     setState(() => cpi = CircularProgressIndicator());
     /** サーバーからデータを取得してローカルのデータを入れ替え */
-    HttpRes.getThokinData("acb");
+    HttpRes.getThokinData("c518vjspeg5s0bv4l0c0");
     /** データを取得 */
     // 貯金データ全部
     List<Thokin> getlist = await SQLite.getThokin();
@@ -89,7 +89,15 @@ class _CotsumiDisplayState extends State<CotsumiDisplay> {
               Container(
                 alignment: Alignment.bottomCenter,
                 height: deviceHeight * 0.2,
-                child: Text("残高"),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                  Text("残高"),
+                  IconButton(
+                    icon: Icon(Icons.autorenew_sharp,color: Theme.of(context).accentColor,size: 40,),
+                    onPressed: () async => loading(),
+                  )
+                ],),
               ),
               Container(
                 alignment: Alignment.center,

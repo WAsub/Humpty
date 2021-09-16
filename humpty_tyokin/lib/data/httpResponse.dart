@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:humpty_tyokin/data/apiResults.dart';
 import 'package:humpty_tyokin/data/sqlite.dart';
@@ -65,7 +66,7 @@ class ChengeNameRequest {
 }
 /** HTTP通信系まとめ */
 class HttpRes{
-  static String ipaddress = "10.21.10.54";
+  static String ipaddress = "10.16.10.51";
   /** 貯金データ取得 */
   static Future<void> getThokinData() async {
     /** HTTP通信 */
@@ -81,12 +82,13 @@ class HttpRes{
     );
     print("message:${httpRes.message}");
     print("data:${httpRes.data}");
+    DateFormat format = DateFormat('yyyy-MM-dd HH:mm:ss');
     /** データを取得できたらローカルのデータを入れ替え */
     if (httpRes.message != "Failed" && httpRes.data != null) {
       List<Thokin> thokin = [];
       for (int i = 0; i < httpRes.data.length; i++) {
         thokin.add(Thokin(
-          date: httpRes.data[i]["datetime"],
+          date: format.parseStrict(httpRes.data[i]["datetime"].toString()),
           money: httpRes.data[i]["money"],
           one_yen: httpRes.data[i]['one_yen'],
           five_yen: httpRes.data[i]['five_yen'],
@@ -102,35 +104,35 @@ class HttpRes{
   }
   /** リモートデータベースの目標リスト更新 */
   static Future<void> remoteGoalsUpdate() async {
-    /** HTTP通信 */
-    ApiResults httpRes;
-    /** ユーザーIDを引き出して */
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String myId = (prefs.getString('myid') ?? "");
-    /** 目標リスト引き出してIDを穴埋め */
-    List<Map<String, dynamic>> glist = [];
-    List<Goal> list = await SQLite.getGoal();
-    for(int i = 0; i < list.length; i++){
-      list[i].userId = myId;
-      glist.add(list[i].toMap());
-    }
-    print("HttpRes.GoalUpdateRequest:${GoalUpdateRequest(goallist: glist).toJson()}");
-    /** サーバーへ登録 */
-    bool flg = false;
-    while (!flg) {
-      /** サーバーへデータを送信 */
-      httpRes = await fetchApiResults(
-        "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
-        new GoalUpdateRequest(goallist: glist).toJson()
-      );
-      print("message:${httpRes.message}");
-      print("data:${httpRes.data}");
-      /** 成功したら端末に保存 */
-      if(httpRes.message != "Failed"){
-        flg = true;
-      }
-      flg = true; // TODO テスト用
-    }
+    // /** HTTP通信 */
+    // ApiResults httpRes;
+    // /** ユーザーIDを引き出して */
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // final String myId = (prefs.getString('myid') ?? "");
+    // /** 目標リスト引き出してIDを穴埋め */
+    // List<Map<String, dynamic>> glist = [];
+    // List<Goal> list = await SQLite.getGoal();
+    // for(int i = 0; i < list.length; i++){
+    //   list[i].userId = myId;
+    //   glist.add(list[i].toMap());
+    // }
+    // print("HttpRes.GoalUpdateRequest:${GoalUpdateRequest(goallist: glist).toJson()}");
+    // /** サーバーへ登録 */
+    // bool flg = false;
+    // while (!flg) {
+    //   /** サーバーへデータを送信 */
+    //   httpRes = await fetchApiResults(
+    //     "http://haveabook.php.xdomain.jp/editing/api/sumple_api.php",
+    //     new GoalUpdateRequest(goallist: glist).toJson()
+    //   );
+    //   print("message:${httpRes.message}");
+    //   print("data:${httpRes.data}");
+    //   /** 成功したら端末に保存 */
+    //   if(httpRes.message != "Failed"){
+    //     flg = true;
+    //   }
+    //   flg = true; // TODO テスト用
+    // }
   }
   /** アカウント作成 */
   static Future<void> signUp(String name, String pass) async {
